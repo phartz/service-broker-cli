@@ -40,7 +40,7 @@ https://mholt.github.io/curl-to-go/
 
 
 ## Download and install
-Service broker cli is written in.
+Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
 
 Downlad the repo the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path with cd `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
 
