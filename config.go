@@ -5,17 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
 )
 
-type Config struct {
+type Credentials struct {
 	Host     string `json:"host"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type Config struct {
+	Credentials
 }
 
 const (
@@ -50,7 +53,7 @@ func getConfig() (string, error) {
 	if err != nil {
 		usr, err := user.Current()
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 
 		config, err = findConfig(usr.HomeDir, false)
@@ -62,24 +65,23 @@ func getConfig() (string, error) {
 	return filepath.Join(config, ConfigFile), nil
 }
 
-func getCon() (*Config, error) {
+func (c *Config) load() error {
 	file, err := getConfig()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	jsonFile, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var c Config
-	err = json.Unmarshal(jsonFile, &c)
+	err = json.Unmarshal(jsonFile, c)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &c, nil
+	return nil
 }
 
 func testFolder(folder string) {
@@ -103,12 +105,28 @@ func testFolder(folder string) {
 	os.Remove(file)
 }
 
+func (c *Config) save() error {
+	configJSON, err := json.Marshal(c)
+	if err != nil {
+		return err
+	}
+
+	dir, _ := filepath.Abs(".")
+	err = ioutil.WriteFile(filepath.Join(dir, ConfigFile), configJSON, 0600)
+	if err != nil {
+		// try to save in users home path
+		usr, err := user.Current()
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(usr.HomeDir, ConfigFile), configJSON, 0600)
+	}
+	return nil
+}
+
 /*
 func main() {
-	c, err := getCon()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(c.Password)
+	c := Config{}
+	c.save()
 }
 */

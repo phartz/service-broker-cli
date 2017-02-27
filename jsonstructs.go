@@ -1,28 +1,18 @@
 package main
 
-import "time"
-
-type ResourceMetadata struct {
-	InstanceGUIDAtTenant string      `json:"instance_guid_at_tenant"`
-	UserParams           interface{} `json:"user_params"`
-	PlanGUID             string      `json:"plan_guid"`
-	TenantID             string      `json:"tenant_id"`
-}
-
 type InstanceResource struct {
-	ID            int                `json:"id"`
-	PlanGUID      string             `json:"plan_guid"`
-	ServiceGUID   string             `json:"service_guid"`
-	Metadata      []ResourceMetadata `json:"metadata"`
-	DashboardURL  interface{}        `json:"dashboard_url"`
-	State         string             `json:"state"`
-	GUIDAtTenant  string             `json:"guid_at_tenant"`
-	TenantID      string             `json:"tenant_id"`
-	ProvisionedAt time.Time          `json:"provisioned_at"`
-	DeletedAt     time.Time          `json:"deleted_at"`
-	CreatedAt     time.Time          `json:"created_at"`
-	UpdatedAt     time.Time          `json:"updated_at"`
-	Credentials   []interface{}      `json:"credentials"`
+	ID            int           `json:"id"`
+	PlanGUID      string        `json:"plan_guid"`
+	ServiceGUID   string        `json:"service_guid"`
+	DashboardURL  interface{}   `json:"dashboard_url"`
+	State         string        `json:"state"`
+	GUIDAtTenant  string        `json:"guid_at_tenant"`
+	TenantID      string        `json:"tenant_id"`
+	ProvisionedAt string        `json:"provisioned_at"`
+	DeletedAt     string        `json:"deleted_at"`
+	CreatedAt     string        `json:"created_at"`
+	UpdatedAt     string        `json:"updated_at"`
+	Credentials   []interface{} `json:"credentials"`
 }
 
 type Instances struct {
