@@ -126,6 +126,10 @@ func services(options []string) {
 
 		_, _ = sb.LastState(service.GUIDAtTenant)
 	}
+	services, err = sb.Instances()
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("\x1b[92mOK\x1b[0m\n\n")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
@@ -339,6 +343,19 @@ func service(options []string) {
 	}
 
 	services, err := sb.Instances()
+	if err != nil {
+		printErr(err)
+		return
+	}
+
+	for _, service := range services.Resources {
+		if service.GUIDAtTenant == options[0] {
+			_, _ = sb.LastState(service.GUIDAtTenant)
+			break
+		}
+	}
+
+	services, err = sb.Instances()
 	if err != nil {
 		printErr(err)
 		return
