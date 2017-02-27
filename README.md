@@ -7,6 +7,13 @@ Service broker cli is written in [`golang`](https://golang.org). It is designed 
 
 Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path with cd `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
 
+Get the depencies:
+```
+go get golang.org/x/crypto/ssh/terminal
+
+go get github.com/fatih/color
+```
+
 Install with `go install service-broker-cli`and build with `go build -o sb`.
 
 Now you can copy it to your bin folder `cp sb /usr/local/bin`
