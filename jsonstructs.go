@@ -49,3 +49,15 @@ type Catalog struct {
 	Services        []CatalogService `json:"services"`
 	DashboardClient interface{}      `json:"dashboard_client"`
 }
+
+type LastState struct {
+	State       string `json:"state"`
+	Description string `json:"description"`
+}
+
+type ProvisonPayload struct {
+	OrganizationGUID string `json:"organization_guid"`
+	PlanID           string `json:"plan_id"`
+	ServiceID        string `json:"service_id"`
+	SpaceGUID        string `json:"space_guid"`
+}

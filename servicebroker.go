@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,8 +20,8 @@ func (s *Servicebroker) SetCredentials(c Credentials) {
 	s.Password = c.Password
 }
 
-func (s *Servicebroker) catalog() (*Catalog, error) {
-	result, err := s.getResultFromBroker("v2/catalog", "GET", "{}")
+func (s *Servicebroker) Catalog() (*Catalog, error) {
+	result, _, _, err := s.getResultFromBroker("v2/catalog", "GET", "{}")
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *Servicebroker) catalog() (*Catalog, error) {
 	}
 	return c, err
 }
-func (s *Servicebroker) testConnection() error {
+func (s *Servicebroker) TestConnection() error {
 	resp, err := http.Get(s.Host)
 	if err != nil {
 		return err
@@ -43,8 +43,22 @@ func (s *Servicebroker) testConnection() error {
 	return nil
 }
 
-func (s *Servicebroker) instances() (*Instances, error) {
-	result, err := s.getResultFromBroker("instances", "GET", "{}")
+func (s *Servicebroker) LastState(instanceId string) (*LastState, error) {
+	result, _, _, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s/last_operation", instanceId), "GET", "{}")
+	if err != nil {
+		return nil, err
+	}
+
+	var l = new(LastState)
+	err = json.Unmarshal(result, &l)
+	if err != nil {
+		return nil, err
+	}
+	return l, err
+}
+
+func (s *Servicebroker) Instances() (*Instances, error) {
+	result, _, _, err := s.getResultFromBroker("instances", "GET", "{}")
 	if err != nil {
 		return nil, err
 	}
@@ -57,11 +71,15 @@ func (s *Servicebroker) instances() (*Instances, error) {
 	return i, err
 }
 
-func (s *Servicebroker) getResultFromBroker(url string, method string, json string) ([]byte, error) {
+func (s *Servicebroker) getResultFromBroker(url string, method string, json string) (bytes []byte, statusCode int, status string, err error) {
+	statusCode = 0
+	status = ""
+	bytes = nil
+
 	body := strings.NewReader(json)
 	req, err := http.NewRequest(method, fmt.Sprintf("%s/%s", s.Host, url), body)
 	if err != nil {
-		return nil, err
+		return
 	}
 	if s.Username != "" {
 		req.SetBasicAuth(s.Username, s.Password)
@@ -70,12 +88,13 @@ func (s *Servicebroker) getResultFromBroker(url string, method string, json stri
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer resp.Body.Close()
-
-	result, err := ioutil.ReadAll(resp.Body)
-	return result, err
+	status = resp.Status
+	statusCode = resp.StatusCode
+	bytes, err = ioutil.ReadAll(resp.Body)
+	return
 }
 
 func (s *Servicebroker) deleteService() {
@@ -94,37 +113,43 @@ func (s *Servicebroker) deleteService() {
 	defer resp.Body.Close()
 }
 
-func (s *Servicebroker) provision() {
-	type Payload struct {
-		OrganizationGUID string `json:"organization_guid"`
-		PlanID           string `json:"plan_id"`
-		ServiceID        string `json:"service_id"`
-		SpaceGUID        string `json:"space_guid"`
-		Parameters       struct {
-			Parameter1 int    `json:"parameter1"`
-			Parameter2 string `json:"parameter2"`
-		} `json:"parameters"`
+func (s *Servicebroker) Deprovision(instanceID string) error {
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "DELETE", "{}")
+	if err != nil {
+		return err
 	}
 
-	data := Payload{
-	// fill struct
+	if statusCode >= 200 && statusCode <= 202 {
+		return nil
 	}
+
+	return errors.New(fmt.Sprintf("Deprovision failure code: %d/%s", statusCode, status))
+}
+
+func (s *Servicebroker) UpdateService(instanceID string) error {
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PATCH", "{}")
+	if err != nil {
+		return err
+	}
+
+	if statusCode >= 200 && statusCode <= 202 {
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("Deprovision failure code: %d/%s", statusCode, status))
+}
+
+func (s *Servicebroker) Provision(data *ProvisonPayload, instanceID string) error {
 	payloadBytes, err := json.Marshal(data)
-	if err != nil {
-		// handle err
-	}
-	body := bytes.NewReader(payloadBytes)
 
-	req, err := http.NewRequest("PUT", "http://username:password@broker-url/v2/service_instances/:instance_id", body)
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PUT", string(payloadBytes))
 	if err != nil {
-		// handle err
+		return err
 	}
-	req.Header.Set("X-Broker-Api-Version", "2.10")
-	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// handle err
+	if statusCode >= 200 && statusCode <= 202 {
+		return nil
 	}
-	defer resp.Body.Close()
+
+	return errors.New(fmt.Sprintf("Provision failure code: %d/%s", statusCode, status))
 }
