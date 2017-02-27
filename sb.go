@@ -118,11 +118,24 @@ func services(options []string) {
 		panic(err)
 	}
 
+	// update states
+	for _, service := range services.Resources {
+		if service.State == "deleted" {
+			continue
+		}
+
+		_, _ = sb.LastState(service.GUIDAtTenant)
+	}
+
 	fmt.Printf("\x1b[92mOK\x1b[0m\n\n")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
 	bold := color.New(color.Bold)
 	bold.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation")
 	for _, service := range services.Resources {
+		if service.State == "deleted" {
+			continue
+		}
+
 		planName := "unknown"
 		if name, found := plans[service.PlanGUID]; found {
 			planName = name
