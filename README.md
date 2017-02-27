@@ -2,6 +2,15 @@
 Service Broker CLI is a commandline to to interact with a cloud foundry like service broker.
 It was written to reduce to time to test changes on a service broker in the development phase.
 
+## Download and install
+Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
+
+Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path with cd `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
+
+Install with `go install service-broker-cli`and build with `go build -o sb`.
+
+Now you can copy it to your bin folder `cp sb /usr/local/bin`
+
 ## Usage
 ```
 $sb help
@@ -36,14 +45,15 @@ SERVICES:
    delete-service-key                     Delete a service key
 
 ```
-https://mholt.github.io/curl-to-go/
 
+The credentials will be stored in json format in the file `.sb`. Those file can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
-## Download and install
-Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
+```
+--> /some/where/on/your/disk
+--> /some/where/on/your
+--> /some/where/on
+--> /some/where
+--> /some
+--> /
+--> ~
 
-Downlad the repo the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path with cd `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
-
-Install with `go install service-broker-cli`and build with `go build -o sb`.
-
-Now you can copy it to your bin folder `cp sb /usr/local/bin`
