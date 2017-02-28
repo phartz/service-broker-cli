@@ -35,6 +35,7 @@ GETTING STARTED:
    login                                  Log user in
    logout                                 Log user out
    target                                 Set or view the targeted org or space
+   auth                                   User authenticate
 
 SERVICES:
    marketplace                            List available offerings in the marketplace
@@ -44,12 +45,11 @@ SERVICES:
    create-service                         Create a service instance
    update-service                         Update a service instance
    delete-service                         Delete a service instance
-   rename-service                         Rename a service instance
 
-   create-service-key                     Create key for a service instance
-   service-keys                           List keys for a service instance
-   service-key                            Show service key info
-   delete-service-key                     Delete a service key
+   create-service-key*                    Create key for a service instance
+   service-keys*                          List keys for a service instance
+   service-key*                           Show service key info
+   delete-service-key*                    Delete a service key
 
 ```
 
