@@ -2,6 +2,14 @@
 Service Broker CLI is a commandline to to interact with a cloud foundry like service broker.
 It was written to reduce to time to test changes on a service broker in the development phase.
 
+## Table of content
+This documentation contains the following topics.
+
+* [Download and install](##Download-and-install)
+* [Usage](##Usage)
+* [Log In](##Log-In)
+* [Logging](##Logging)
+
 ## Download and install
 Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
 
