@@ -1,6 +1,6 @@
 package main
 
-type SBFunction func([]string)
+type SBFunction func(*Commandline)
 
 type SBCommand struct {
 	Name     string

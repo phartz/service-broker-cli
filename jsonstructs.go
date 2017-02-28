@@ -1,18 +1,24 @@
 package main
 
 type InstanceResource struct {
-	ID            int           `json:"id"`
-	PlanGUID      string        `json:"plan_guid"`
-	ServiceGUID   string        `json:"service_guid"`
-	DashboardURL  interface{}   `json:"dashboard_url"`
-	State         string        `json:"state"`
-	GUIDAtTenant  string        `json:"guid_at_tenant"`
-	TenantID      string        `json:"tenant_id"`
-	ProvisionedAt string        `json:"provisioned_at"`
-	DeletedAt     string        `json:"deleted_at"`
-	CreatedAt     string        `json:"created_at"`
-	UpdatedAt     string        `json:"updated_at"`
-	Credentials   []interface{} `json:"credentials"`
+	ID            int          `json:"id"`
+	PlanGUID      string       `json:"plan_guid"`
+	ServiceGUID   string       `json:"service_guid"`
+	DashboardURL  interface{}  `json:"dashboard_url"`
+	State         string       `json:"state"`
+	GUIDAtTenant  string       `json:"guid_at_tenant"`
+	TenantID      string       `json:"tenant_id"`
+	ProvisionedAt string       `json:"provisioned_at"`
+	DeletedAt     string       `json:"deleted_at"`
+	CreatedAt     string       `json:"created_at"`
+	UpdatedAt     string       `json:"updated_at"`
+	Credentials   []Credential `json:"credentials"`
+}
+
+type Credential struct {
+	ID           int    `json:"id"`
+	InstanceID   int    `json:"instance_id"`
+	GUIDAtTenant string `json:"guid_at_tenant"`
 }
 
 type Instances struct {
@@ -60,4 +66,14 @@ type ProvisonPayload struct {
 	PlanID           string `json:"plan_id"`
 	ServiceID        string `json:"service_id"`
 	SpaceGUID        string `json:"space_guid"`
+}
+
+type BindPayload struct {
+	ServiceID string `json:"service_id"`
+	PlanID    string `json:"plan_id"`
+}
+
+type SBError struct {
+	Description string `json:"description"`
+	Error       string `json:"error"`
 }

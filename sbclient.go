@@ -96,7 +96,8 @@ func (s *SBClient) getResultFromBroker(url string, method string, json string) (
 
 	if os.Getenv("SB_TRACE") == "ON" {
 		fmt.Println("")
-		fmt.Printf("\tRequest to %s\n", target)
+		fmt.Printf("\tRequest to: %s\n", target)
+		fmt.Printf("\tMethod:     %s\n", method)
 		fmt.Printf("\tBody:\n\t%s\n", json)
 	}
 
@@ -130,22 +131,6 @@ func (s *SBClient) getResultFromBroker(url string, method string, json string) (
 	}
 
 	return
-}
-
-func (s *SBClient) deleteService() {
-	body := strings.NewReader(`{ "service_id":$SERVICE_ID, "plan_id":$PLAN_ID, "organization_id":$ORGANIZATION_ID }`)
-	req, err := http.NewRequest("DELETE", os.ExpandEnv("$1/v2/service_instances/$2"), body)
-	if err != nil {
-		// handle err
-	}
-	req.SetBasicAuth("password", "user")
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// handle err
-	}
-	defer resp.Body.Close()
 }
 
 func (s *SBClient) Deprovision(instanceID string) error {
@@ -187,4 +172,39 @@ func (s *SBClient) Provision(data *ProvisonPayload, instanceID string) error {
 	}
 
 	return errors.New(fmt.Sprintf("Provision failure code: %d/%s", statusCode, status))
+}
+
+func (s *SBClient) Bind(data *BindPayload, instanceID string, bindID string) (string, error) {
+	payloadBytes, err := json.Marshal(data)
+
+	bytes, _, _, err := s.getResultFromBroker(fmt.Sprintf("/v2/service_instances/%s/service_bindings/%s", instanceID, bindID), "PUT", string(payloadBytes))
+	if err != nil {
+		return "", err
+	}
+
+	var sbError = new(SBError)
+	err = json.Unmarshal(bytes, &sbError)
+
+	if err != nil {
+		return "", err
+	}
+
+	if sbError != nil && sbError.Error != "" {
+		return "", errors.New(sbError.Error)
+	}
+
+	return string(bytes), nil
+}
+
+func (s *SBClient) UnBind(data *BindPayload, instanceID string, bindID string) error {
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s/service_bindings/%s?service_id=%s&plan_id=%s", instanceID, bindID, data.ServiceID, data.PlanID), "DELETE", "{}")
+	if err != nil {
+		return err
+	}
+
+	if statusCode == 200 {
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("Unbind failure code: %d/%s", statusCode, status))
 }

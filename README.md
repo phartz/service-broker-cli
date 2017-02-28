@@ -7,6 +7,7 @@ This documentation contains the following topics.
 
 * [Download and install](##Download-and-install)
 * [Usage](##Usage)
+* [Restrictions](##Restrictions)
 * [Log In](##Log-In)
 * [Logging](##Logging)
 
@@ -54,12 +55,20 @@ SERVICES:
    update-service                         Update a service instance
    delete-service                         Delete a service instance
 
-   create-service-key*                    Create key for a service instance
-   service-keys*                          List keys for a service instance
-   service-key*                           Show service key info
-   delete-service-key*                    Delete a service key
+   create-service-key                     Create key for a service instance
+   service-keys                           List keys for a service instance
+   delete-service-key                     Delete a service key
 
 ```
+
+## Restrictions
+
+There are some restrictions:
+* The service broker doesn't store any user crendetials so it is not possible to get information about a service key. 
+In contrast to to CloudFounndry CLI the `sb create-service-key` returns the credentials.
+* The service broker also doesn't store any information about the real service names, the broker only works with UUIDs.
+
+
 ## Log In
 
 To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting. 

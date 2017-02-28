@@ -30,19 +30,21 @@ func main() {
 	addCommand("update-service", "", "Update a service instance", UpdateService)
 	addCommand("delete-service", "ds", "Delete a service instance", DeleteService)
 	addCommand("", "", "", nil)
-	addCommand("create-service-key", "csk", "Create key for a service instance", notImplemented)
-	addCommand("service-keys", "sk", "List keys for a service instance", notImplemented)
-	addCommand("service-key", "", "Show service key info", notImplemented)
-	addCommand("delete-service-key", "dsk", "Delete a service key", notImplemented)
+	addCommand("create-service-key", "csk", "Create key for a service instance", CreateServiceKey)
+	addCommand("service-keys", "sk", "List keys for a service instance", ServiceKeys)
+	addCommand("delete-service-key", "dsk", "Delete a service key", DeleteServiceKey)
 
 	if len(os.Args) == 1 {
 		usage()
 		return
 	}
 
+	c := new(Commandline)
+	c.Parse(os.Args)
+
 	for _, command := range sbcommands {
-		if command.Name == os.Args[1] || command.Shortcut == os.Args[1] {
-			command.Function(os.Args[2:])
+		if command.Name == c.Command || command.Shortcut == c.Command {
+			command.Function(c)
 			return
 		}
 	}

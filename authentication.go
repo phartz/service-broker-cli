@@ -10,7 +10,7 @@ import (
 )
 
 // retreieves all service instances from the service broker
-func Logout(options []string) {
+func Logout(cmd *Commandline) {
 	fmt.Println("Loggin out...")
 
 	c := Config{}
@@ -22,25 +22,25 @@ func Logout(options []string) {
 	fmt.Printf("\x1b[92mOK\x1b[0m\n\n")
 }
 
-func Target(options []string) {
+func Target(cmd *Commandline) {
 	c := Config{}
 	c.load()
 
-	if len(options) == 0 {
+	if len(cmd.Options) == 0 {
 		if c.Host == "" {
 			fmt.Printf("\033[1mNo target set!\n")
 		} else {
 			fmt.Printf("Actual target \033[1m%s\n", c.Host)
 		}
 	} else {
-		sb := createSBClient(&Credentials{Host: options[0]})
+		sb := createSBClient(&Credentials{Host: cmd.Options[0]})
 		err := sb.TestConnection()
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
 
-		c.Host = options[0]
+		c.Host = cmd.Options[0]
 		c.Password = ""
 		c.Username = ""
 		c.save()
@@ -51,8 +51,8 @@ func Target(options []string) {
 	}
 }
 
-func Auth(options []string) {
-	if len(options) != 2 {
+func Auth(cmd *Commandline) {
+	if len(cmd.Options) != 2 {
 		color.Set(color.FgRed)
 		fmt.Printf("Missing arguments!\n\n")
 		color.Unset()
@@ -87,7 +87,7 @@ func Auth(options []string) {
 	color.Unset()
 
 	fmt.Printf("\nAuthenticating...")
-	sb = createSBClient(&Credentials{Host: conf.Host, Username: options[0], Password: options[1]})
+	sb = createSBClient(&Credentials{Host: conf.Host, Username: cmd.Options[0], Password: cmd.Options[1]})
 	_, err = sb.Catalog()
 	if err != nil {
 		color.Set(color.FgRed)
@@ -95,8 +95,8 @@ func Auth(options []string) {
 		color.Unset()
 		return
 	}
-	conf.Username = options[0]
-	conf.Password = options[1]
+	conf.Username = cmd.Options[0]
+	conf.Password = cmd.Options[1]
 	conf.save()
 
 	color.Set(color.FgGreen)
@@ -104,7 +104,7 @@ func Auth(options []string) {
 	color.Unset()
 }
 
-func Status(options []string) {
+func Status(cmd *Commandline) {
 	conf := Config{}
 	conf.load()
 
@@ -141,7 +141,7 @@ func Status(options []string) {
 	color.Unset()
 }
 
-func Login(options []string) {
+func Login(cmd *Commandline) {
 	conf := Config{}
 	conf.load()
 

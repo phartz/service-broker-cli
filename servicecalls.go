@@ -12,11 +12,15 @@ import (
 )
 
 // retreieves all service instances from the service broker
-func Services(options []string) {
+func Services(cmd *Commandline) {
 	sb := getServiceBroker()
 	fmt.Printf("Getting services from Servicebroker \x1b[96m%s\x1b[0m as \x1b[96m%s\x1b[0m\n", sb.Host, sb.Username)
 
 	catalog, err := sb.Catalog()
+	if err != nil {
+		panic(err)
+	}
+
 	plans := make(map[string]string)
 	for _, plan := range catalog.Services[0].Plans {
 		plans[plan.ID] = plan.Name
@@ -61,7 +65,7 @@ func Services(options []string) {
 }
 
 // retrieves the available service plans from the service broker
-func Marketplace(options []string) {
+func Marketplace(cmd *Commandline) {
 	sb := getServiceBroker()
 
 	fmt.Printf("Getting services from Servicebroker \x1b[36;1m%s\x1b[0m as \x1b[36;1m%s\x1b[0m\n", sb.Host, sb.Username)
@@ -87,7 +91,25 @@ func Marketplace(options []string) {
 	fmt.Println("")
 }
 
-func Service(options []string) {
+func getServiceIDPlanID(servicename string) (string, string, error) {
+	sb := getServiceBroker()
+
+	services, err := sb.Instances()
+	if err != nil {
+		printErr(err)
+		return "", "", err
+	}
+
+	for _, service := range services.Resources {
+		if service.GUIDAtTenant == servicename {
+			return service.ServiceGUID, service.PlanGUID, nil
+		}
+	}
+
+	return "", "", errors.New("Service not found!")
+}
+
+func Service(cmd *Commandline) {
 	sb := getServiceBroker()
 
 	catalog, err := sb.Catalog()
@@ -108,7 +130,7 @@ func Service(options []string) {
 	}
 
 	for _, service := range services.Resources {
-		if service.GUIDAtTenant == options[0] {
+		if service.GUIDAtTenant == cmd.Options[0] {
 			_, _ = sb.LastState(service.GUIDAtTenant)
 			break
 		}
@@ -121,7 +143,7 @@ func Service(options []string) {
 	}
 
 	for _, service := range services.Resources {
-		if service.GUIDAtTenant == options[0] {
+		if service.GUIDAtTenant == cmd.Options[0] {
 			fmt.Println("")
 			planName := "unknown"
 			if name, found := plans[service.PlanGUID]; found {
@@ -129,7 +151,7 @@ func Service(options []string) {
 			}
 			col := color.New(color.FgCyan)
 
-			lastState, err := sb.LastState(options[0])
+			lastState, err := sb.LastState(cmd.Options[0])
 			if err != nil {
 				fmt.Printf("Failed!\n")
 				printErr(err)
@@ -160,10 +182,10 @@ func Service(options []string) {
 	fmt.Println("Service instance not found.")
 }
 
-func CreateService(options []string) {
+func CreateService(cmd *Commandline) {
 	sb := getServiceBroker()
 	fmt.Printf("Creating service at Servicebroker \x1b[36;1m%s\x1b[0m as \x1b[36;1m%s\x1b[0m\n", sb.Host, sb.Username)
-	if len(options) != 3 {
+	if len(cmd.Options) != 3 {
 		color.Set(color.FgRed)
 		fmt.Printf("Failed!\n")
 		color.Unset()
@@ -177,7 +199,7 @@ func CreateService(options []string) {
 		return
 	}
 
-	if catalog.Services[0].Name != options[0] {
+	if catalog.Services[0].Name != cmd.Options[0] {
 		fmt.Printf("Failed!\n")
 		color.Unset()
 		fmt.Println("Service offering not found. Check the marketplace.")
@@ -187,7 +209,7 @@ func CreateService(options []string) {
 
 	var planID string
 	for _, plan := range catalog.Services[0].Plans {
-		if options[1] == plan.Name {
+		if cmd.Options[1] == plan.Name {
 			planID = plan.ID
 		}
 	}
@@ -210,7 +232,7 @@ func CreateService(options []string) {
 		ServiceID:        catalog.Services[0].ID,
 	}
 
-	err = sb.Provision(&data, options[2])
+	err = sb.Provision(&data, cmd.Options[2])
 
 	color.Set(color.FgGreen)
 	fmt.Printf("OK\n\n")
@@ -222,12 +244,12 @@ func CreateService(options []string) {
 	color.Unset()
 	fmt.Printf("' or '")
 	color.Set(color.FgGreen)
-	fmt.Printf("cf service %s", options[2])
+	fmt.Printf("cf service %s", cmd.Options[2])
 	color.Unset()
 	fmt.Printf("' to check operation status.\n")
 }
 
-func DeleteService(options []string) {
+func DeleteService(cmd *Commandline) {
 	sb := getServiceBroker()
 
 	instances, err := sb.Instances()
@@ -238,7 +260,7 @@ func DeleteService(options []string) {
 
 	found := false
 	for _, instance := range instances.Resources {
-		if instance.GUIDAtTenant == options[0] {
+		if instance.GUIDAtTenant == cmd.Options[0] {
 			found = true
 			break
 		}
@@ -249,20 +271,22 @@ func DeleteService(options []string) {
 		return
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("\nReally delete service %s> ", options[0])
-	asked, _ := reader.ReadString('\n')
-	asked = strings.TrimSpace(asked)
-	if asked != "yes" {
-		color.Set(color.FgMagenta)
-		fmt.Println("Delete cancelled!")
-		color.Unset()
-		return
+	if !cmd.Force {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Printf("\nReally delete service %s> ", cmd.Options[0])
+		asked, _ := reader.ReadString('\n')
+		asked = strings.TrimSpace(asked)
+		if asked != "yes" {
+			color.Set(color.FgMagenta)
+			fmt.Println("Delete cancelled!")
+			color.Unset()
+			return
+		}
 	}
 
-	err = sb.Deprovision(options[0])
+	err = sb.Deprovision(cmd.Options[0])
 
-	fmt.Printf("Deleting service %s at %s as %s...\n", options[0], sb.Host, sb.Username)
+	fmt.Printf("Deleting service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)
 	color.Set(color.FgGreen)
 	fmt.Printf("OK\n\n")
 	color.Unset()
@@ -273,12 +297,12 @@ func DeleteService(options []string) {
 	color.Unset()
 	fmt.Printf("' or '")
 	color.Set(color.FgGreen)
-	fmt.Printf("cf service %s", options[0])
+	fmt.Printf("cf service %s", cmd.Options[0])
 	color.Unset()
 	fmt.Printf("' to check operation status.\n")
 }
 
-func UpdateService(options []string) {
+func UpdateService(cmd *Commandline) {
 	sb := getServiceBroker()
 
 	instances, err := sb.Instances()
@@ -289,7 +313,7 @@ func UpdateService(options []string) {
 
 	found := false
 	for _, instance := range instances.Resources {
-		if instance.GUIDAtTenant == options[0] {
+		if instance.GUIDAtTenant == cmd.Options[0] {
 			found = true
 			break
 		}
@@ -300,9 +324,9 @@ func UpdateService(options []string) {
 		return
 	}
 
-	err = sb.UpdateService(options[0])
+	err = sb.UpdateService(cmd.Options[0])
 
-	fmt.Printf("Updating service %s at %s as %s...\n", options[0], sb.Host, sb.Username)
+	fmt.Printf("Updating service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)
 	color.Set(color.FgGreen)
 	fmt.Printf("OK\n\n")
 	color.Unset()
@@ -313,7 +337,7 @@ func UpdateService(options []string) {
 	color.Unset()
 	fmt.Printf("' or '")
 	color.Set(color.FgGreen)
-	fmt.Printf("cf service %s", options[0])
+	fmt.Printf("cf service %s", cmd.Options[0])
 	color.Unset()
 	fmt.Printf("' to check operation status.\n")
 }
