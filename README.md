@@ -52,6 +52,9 @@ SERVICES:
    delete-service-key*                    Delete a service key
 
 ```
+## Log In
+
+To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting. 
 
 The credentials will be stored in json format in the file `.sb`. Those file can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
@@ -63,4 +66,11 @@ The credentials will be stored in json format in the file `.sb`. Those file can 
 --> /some
 --> /
 --> ~
+```
+ ## Logging
+ Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service-Broker API requests and answers.
 
+ ```
+ SB_TRACE=ON && sb services
+ ``` 
+ 

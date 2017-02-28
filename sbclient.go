@@ -35,12 +35,26 @@ func (s *SBClient) Catalog() (*Catalog, error) {
 }
 
 func (s *SBClient) TestConnection() error {
+	if os.Getenv("SB_TRACE") == "ON" {
+		fmt.Println("")
+		fmt.Printf("\tTest host %s\n", s.Host)
+	}
+
 	resp, err := http.Get(s.Host)
+
 	if err != nil {
+		if os.Getenv("SB_TRACE") == "ON" {
+			fmt.Println("")
+			fmt.Printf("\tError: %s\n", err.Error())
+		}
 		return err
 	}
-	defer resp.Body.Close()
 
+	if os.Getenv("SB_TRACE") == "ON" {
+		fmt.Println("")
+		fmt.Println("\tStatus: OK\n")
+	}
+	defer resp.Body.Close()
 	return nil
 }
 
@@ -78,7 +92,15 @@ func (s *SBClient) getResultFromBroker(url string, method string, json string) (
 	bytes = nil
 
 	body := strings.NewReader(json)
-	req, err := http.NewRequest(method, fmt.Sprintf("%s/%s", s.Host, url), body)
+	target := fmt.Sprintf("%s/%s", s.Host, url)
+
+	if os.Getenv("SB_TRACE") == "ON" {
+		fmt.Println("")
+		fmt.Printf("\tRequest to %s\n", target)
+		fmt.Printf("\tBody:\n\t%s\n", json)
+	}
+
+	req, err := http.NewRequest(method, target, body)
 	if err != nil {
 		return
 	}
@@ -88,13 +110,25 @@ func (s *SBClient) getResultFromBroker(url string, method string, json string) (
 	req.Header.Set("Content-Type", "application/json") //"application/x-www-form-urlencoded")
 
 	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
+		if os.Getenv("SB_TRACE") == "ON" {
+			fmt.Printf("\tError:\n\t%s\n", err.Error())
+		}
 		return
 	}
+
 	defer resp.Body.Close()
+
 	status = resp.Status
 	statusCode = resp.StatusCode
+
 	bytes, err = ioutil.ReadAll(resp.Body)
+	if os.Getenv("SB_TRACE") == "ON" {
+		fmt.Printf("\tStatus: %d/%s\n", resp.StatusCode, resp.Status)
+		fmt.Printf("\tBody:\n\t%s\n", string(bytes))
+	}
+
 	return
 }
 
