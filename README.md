@@ -35,7 +35,7 @@ GETTING STARTED:
    login                                  Log user in
    logout                                 Log user out
    target                                 Set or view the targeted org or space
-   auth                                   User authenticate
+   auth                                   User authentication
 
 SERVICES:
    marketplace                            List available offerings in the marketplace
