@@ -67,7 +67,7 @@ func usage() {
 }
 
 // creates the Servicebroker client, in later version the user credentials should be read out of a file
-func getServiceBroker() *Servicebroker {
+func getServiceBroker() *SBClient {
 	c := Config{}
 	c.load()
 
@@ -75,8 +75,8 @@ func getServiceBroker() *Servicebroker {
 }
 
 // creates the Servicebroker client, in later version the user credentials should be read out of a file
-func createServiceBroker(c *Credentials) *Servicebroker {
-	var sb Servicebroker
+func createServiceBroker(c *Credentials) *SBClient {
+	var sb SBClient
 	sb.Host = c.Host
 	sb.Username = c.Username
 	sb.Password = c.Password

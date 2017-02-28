@@ -10,17 +10,17 @@ import (
 	"strings"
 )
 
-type Servicebroker struct {
+type SBClient struct {
 	Credentials
 }
 
-func (s *Servicebroker) SetCredentials(c Credentials) {
+func (s *SBClient) SetCredentials(c Credentials) {
 	s.Host = c.Host
 	s.Username = c.Username
 	s.Password = c.Password
 }
 
-func (s *Servicebroker) Catalog() (*Catalog, error) {
+func (s *SBClient) Catalog() (*Catalog, error) {
 	result, _, _, err := s.getResultFromBroker("v2/catalog", "GET", "{}")
 	if err != nil {
 		return nil, err
@@ -33,7 +33,8 @@ func (s *Servicebroker) Catalog() (*Catalog, error) {
 	}
 	return c, err
 }
-func (s *Servicebroker) TestConnection() error {
+
+func (s *SBClient) TestConnection() error {
 	resp, err := http.Get(s.Host)
 	if err != nil {
 		return err
@@ -43,7 +44,7 @@ func (s *Servicebroker) TestConnection() error {
 	return nil
 }
 
-func (s *Servicebroker) LastState(instanceId string) (*LastState, error) {
+func (s *SBClient) LastState(instanceId string) (*LastState, error) {
 	result, _, _, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s/last_operation", instanceId), "GET", "{}")
 	if err != nil {
 		return nil, err
@@ -57,7 +58,7 @@ func (s *Servicebroker) LastState(instanceId string) (*LastState, error) {
 	return l, err
 }
 
-func (s *Servicebroker) Instances() (*Instances, error) {
+func (s *SBClient) Instances() (*Instances, error) {
 	result, _, _, err := s.getResultFromBroker("instances", "GET", "{}")
 	if err != nil {
 		return nil, err
@@ -71,7 +72,7 @@ func (s *Servicebroker) Instances() (*Instances, error) {
 	return i, err
 }
 
-func (s *Servicebroker) getResultFromBroker(url string, method string, json string) (bytes []byte, statusCode int, status string, err error) {
+func (s *SBClient) getResultFromBroker(url string, method string, json string) (bytes []byte, statusCode int, status string, err error) {
 	statusCode = 0
 	status = ""
 	bytes = nil
@@ -97,7 +98,7 @@ func (s *Servicebroker) getResultFromBroker(url string, method string, json stri
 	return
 }
 
-func (s *Servicebroker) deleteService() {
+func (s *SBClient) deleteService() {
 	body := strings.NewReader(`{ "service_id":$SERVICE_ID, "plan_id":$PLAN_ID, "organization_id":$ORGANIZATION_ID }`)
 	req, err := http.NewRequest("DELETE", os.ExpandEnv("$1/v2/service_instances/$2"), body)
 	if err != nil {
@@ -113,7 +114,7 @@ func (s *Servicebroker) deleteService() {
 	defer resp.Body.Close()
 }
 
-func (s *Servicebroker) Deprovision(instanceID string) error {
+func (s *SBClient) Deprovision(instanceID string) error {
 	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "DELETE", "{}")
 	if err != nil {
 		return err
@@ -126,7 +127,7 @@ func (s *Servicebroker) Deprovision(instanceID string) error {
 	return errors.New(fmt.Sprintf("Deprovision failure code: %d/%s", statusCode, status))
 }
 
-func (s *Servicebroker) UpdateService(instanceID string) error {
+func (s *SBClient) UpdateService(instanceID string) error {
 	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PATCH", "{}")
 	if err != nil {
 		return err
@@ -139,7 +140,7 @@ func (s *Servicebroker) UpdateService(instanceID string) error {
 	return errors.New(fmt.Sprintf("Deprovision failure code: %d/%s", statusCode, status))
 }
 
-func (s *Servicebroker) Provision(data *ProvisonPayload, instanceID string) error {
+func (s *SBClient) Provision(data *ProvisonPayload, instanceID string) error {
 	payloadBytes, err := json.Marshal(data)
 
 	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PUT", string(payloadBytes))
