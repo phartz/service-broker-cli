@@ -67,10 +67,12 @@ The credentials will be stored in json format in the file `.sb`. Those file can 
 --> /
 --> ~
 ```
- ## Logging
- Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service-Broker API requests and answers.
 
- ```
- SB_TRACE=ON && sb services
- ``` 
+## Logging
+ 
+Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service-Broker API requests and answers.
+
+```
+$ SB_TRACE=ON && sb services
+``` 
  
