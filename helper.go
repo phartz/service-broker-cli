@@ -9,8 +9,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/fatih/color"
-
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -28,13 +26,21 @@ func getPassword(prompt string) (password string, err error) {
 	return
 }
 
-func printErr(err error) {
-	color.Set(color.FgRed)
-	fmt.Printf("Failed!\n\n")
-	color.Unset()
-	fmt.Println(err.Error())
-	return
+func getVersionString() string {
+	return fmt.Sprintf("%s+%s", Version, Build)
 }
+
+func printErr(err error, helpTexts ...string) {
+	fmt.Fprintf(os.Stderr, "error: %v\n", err)
+
+	for _, text := range helpTexts {
+		fmt.Println()
+		fmt.Println(text)
+	}
+
+	os.Exit(1)
+}
+
 func newUUID() (string, error) {
 	uuid := make([]byte, 16)
 	n, err := io.ReadFull(rand.Reader, uuid)

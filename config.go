@@ -92,7 +92,7 @@ func testFolder(folder string) {
 	defer f.Close()
 
 	if err != nil {
-		panic(err)
+		printErr(err)
 	}
 
 	found, err := getConfig()
@@ -124,9 +124,8 @@ func (c *Config) save() error {
 	return nil
 }
 
-/*
-func main() {
+func LoadConfig() *Config {
 	c := Config{}
-	c.save()
+	c.load()
+	return &c
 }
-*/

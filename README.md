@@ -19,8 +19,6 @@ Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` th
 Get the depencies:
 ```
 go get golang.org/x/crypto/ssh/terminal
-
-go get github.com/fatih/color
 ```
 
 Install with `go install service-broker-cli`and build with `go build -o sb`.

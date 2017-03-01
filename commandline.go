@@ -14,7 +14,7 @@ type Commandline struct {
 	Plan       string
 	Tags       string
 	Custom     string
-	Output     string
+	JSON       bool
 }
 
 func (c *Commandline) Parse(options []string) (err error) {
@@ -23,7 +23,6 @@ func (c *Commandline) Parse(options []string) (err error) {
 	c.NoOptions = false
 
 	err = nil
-
 	if len(options) == 1 {
 		return
 	}
@@ -43,25 +42,35 @@ func (c *Commandline) Parse(options []string) (err error) {
 		}
 	}
 
-	c.Options = options[2:flagPos]
-	c.NoOptions = len(c.Options) > 0
-
 	if flagPos == -1 {
+		c.Options = options[2:]
+		c.NoOptions = len(c.Options) > 0
 		return
 	}
+
+	c.Options = options[2:flagPos]
+	c.NoOptions = len(c.Options) > 0
 
 	flagSet := flag.NewFlagSet("flags", flag.ExitOnError)
 	force := flagSet.Bool("f", false, "")
 	plan := flagSet.String("p", "", "")
 	tags := flagSet.String("t", "", "")
 	custom := flagSet.String("c", "", "")
-	output := flagSet.String("o", "", "")
+	json := flagSet.Bool("j", false, "")
+
 	flagSet.Parse(options[flagPos:])
+
 	c.Force = *force
 	c.Plan = *plan
 	c.Tags = *tags
 	c.Custom = *custom
-	c.Output = *output
+	c.JSON = *json
 
 	return
+}
+
+func NewCommandline(options []string) *Commandline {
+	c := new(Commandline)
+	c.Parse(options)
+	return c
 }
