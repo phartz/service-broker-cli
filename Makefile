@@ -13,6 +13,7 @@ build:
 # Install project
 install:
 	go install ${LDFLAGS}
+	mv ${GOPATH}/bin/service-broker-cli ${GOPATH}/bin/sb
 
 # Clean our project
 clean:
