@@ -2,28 +2,33 @@
 Service Broker CLI is a commandline to to interact with a cloud foundry like service broker.
 It was written to reduce to time to test changes on a service broker in the development phase.
 
-## Table of content
+## Table of Content
 This documentation contains the following topics.
 
-* [Download and install](##Download-and-install)
+* [Download, Build and Install](##Download-Build-and-Install)
 * [Usage](##Usage)
 * [Restrictions](##Restrictions)
 * [Log In](##Log-In)
 * [Logging](##Logging)
 
-## Download and install
+## Download, Build and Install
 Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
 
-Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path with cd `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
+It provides also a Makefile, so it's quite easy to build and install.
 
-Get the depencies:
+Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path to the sources `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
+
+Build
 ```
-go get golang.org/x/crypto/ssh/terminal
+make
 ```
 
-Install with `go install service-broker-cli`and build with `go build -o sb`.
+Install
+```
+make install
+```
 
-Now you can copy it to your bin folder `cp sb /usr/local/bin`
+Either add the `$GOPATH/bin` `export PATH=$PATH:$GOPATH/bin` to your `$PATH` or copy the cli to your bin folder `cp sb /usr/local/bin`
 
 ## Usage
 ```
@@ -35,29 +40,33 @@ NAME:
 USAGE:
    sb [global options] command [arguments...] [command options]
 
-GETTING STARTED:
-   help                                   Show help
-   version                                Print the version
-   status                                 Print the status information
-   login                                  Log user in
-   logout                                 Log user out
-   target                                 Set or view the targeted org or space
-   auth                                   User authentication
+COMMANDS
 
-SERVICES:
-   marketplace                            List available offerings in the marketplace
-   services                               List all service instances in the target space
-   service                                Show service instance info
+    COMMAND               SHORTCUT    DESCRIPTION
+    help                  h           Show help
 
-   create-service                         Create a service instance
-   update-service                         Update a service instance
-   delete-service                         Delete a service instance
+    target                t           Sets or gets the target
+    login                 l           Login to the target
+    logout                lo          Logout from the target
+    auth                              Authenticate to the target
+    version               -v          Print the version
 
-   create-service-key                     Create key for a service instance
-   service-keys                           List keys for a service instance
-   delete-service-key                     Delete a service key
+    marketplace           m           List available offerings in the marketplace
+    services              s           List all service instances in the target space
+    service                           Show service instance info
+
+    create-service        cs          Create a service instance
+    update-service                    Update a service instance
+    delete-service        ds          Delete a service instance
+
+    create-service-key    csk         Create key for a service instance
+    service-keys          sk          List keys for a service instance
+    delete-service-key    dsk         Delete a service key
 
 ```
+
+To get specific help use `sb help <command>`
+
 
 ## Restrictions
 
