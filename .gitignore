@@ -2,3 +2,4 @@ sb
 tmp/
 .sb
 service-broker-cli
+**/*.tgz
