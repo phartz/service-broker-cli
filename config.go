@@ -50,16 +50,10 @@ func findConfig(dir string, recursive ...bool) (string, error) {
 func getConfig() (string, error) {
 	dir, _ := filepath.Abs(".")
 	config, err := findConfig(dir)
-	if err != nil {
-		usr, err := user.Current()
-		if err != nil {
-			return "", err
-		}
 
-		config, err = findConfig(usr.HomeDir, false)
-		if err != nil {
-			return "", err
-		}
+	if err != nil {
+		config, err = findConfig(getUserHome(), false)
+		checkErr(err)
 	}
 
 	return filepath.Join(config, ConfigFile), nil
@@ -90,10 +84,7 @@ func testFolder(folder string) {
 	file := filepath.Join(folder, ConfigFile)
 	f, err := os.Create(file)
 	defer f.Close()
-
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	found, err := getConfig()
 	if err != nil {

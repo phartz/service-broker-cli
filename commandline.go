@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"strings"
 )
 
@@ -59,14 +60,37 @@ func (c *Commandline) Parse(options []string) (err error) {
 	json := flagSet.Bool("j", false, "")
 
 	flagSet.Parse(options[flagPos:])
-
 	c.Force = *force
 	c.Plan = *plan
 	c.Tags = *tags
-	c.Custom = *custom
+	c.Custom = c.checkCustom(*custom)
 	c.JSON = *json
 
 	return
+}
+
+func (c *Commandline) checkCustom(unknown string) string {
+	if unknown == "" {
+		return ""
+	}
+
+	if strings.HasPrefix(unknown, "{") {
+		return unknown
+	}
+
+	bytes, err := ioutil.ReadFile(unknown)
+	if len(bytes) > 0 {
+		return string(bytes)
+	}
+
+	// check Home Folder
+	if strings.HasPrefix(unknown, "~") {
+		bytes, err = ioutil.ReadFile(getUserHome() + unknown[1:])
+		checkErr(err)
+		return string(bytes)
+	}
+
+	return unknown
 }
 
 func NewCommandline(options []string) *Commandline {

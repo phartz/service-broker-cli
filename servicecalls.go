@@ -12,12 +12,10 @@ import (
 // retreieves all service instances from the service broker
 func Services(cmd *Commandline) {
 	sb := NewSBClient()
-	fmt.Printf("Getting services from Servicebroker \x1b[96m%s\x1b[0m as \x1b[96m%s\x1b[0m\n", sb.Host, sb.Username)
+	fmt.Printf("Getting services from Servicebroker %s as %s\n", sb.Host, sb.Username)
 
 	catalog, err := sb.Catalog()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	plans := make(map[string]string)
 	for _, plan := range catalog.Services[0].Plans {
@@ -25,9 +23,7 @@ func Services(cmd *Commandline) {
 	}
 
 	services, err := sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	// update states
 	for _, service := range services.Resources {
@@ -38,9 +34,7 @@ func Services(cmd *Commandline) {
 		_, _ = sb.LastState(service.GUIDAtTenant)
 	}
 	services, err = sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	fmt.Printf("OK\n\n")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
@@ -68,9 +62,7 @@ func Marketplace(cmd *Commandline) {
 	fmt.Printf("Getting services from Servicebroker %s as %s\n", sb.Host, sb.Username)
 
 	catalog, err := sb.Catalog()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	fmt.Println("OK\n")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
@@ -88,35 +80,30 @@ func Marketplace(cmd *Commandline) {
 	fmt.Println("")
 }
 
-func getServiceIDPlanID(servicename string) (string, string, error) {
+func getServiceIDPlanID(servicename string) (*BindPayload, error) {
 	sb := NewSBClient()
 
 	services, err := sb.Instances()
-	if err != nil {
-		printErr(err)
-		return "", "", err
-	}
+	checkErr(err)
 
 	for _, service := range services.Resources {
 		if service.GUIDAtTenant == servicename {
-			return service.ServiceGUID, service.PlanGUID, nil
+			return &BindPayload{ServiceID: service.ServiceGUID, PlanID: service.PlanGUID}, nil
 		}
 	}
 
-	return "", "", errors.New("Service not found!")
+	return nil, errors.New("Service not found!")
 }
 
 func Service(cmd *Commandline) {
 	if len(cmd.Options) != 1 {
-		printErr(errors.New("Missing arguments!"), GetHelpText("Service"))
+		checkErr(errors.New("Missing arguments!"), GetHelpText("Service"))
 	}
 
 	sb := NewSBClient()
 
 	catalog, err := sb.Catalog()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	plans := make(map[string]string)
 	for _, plan := range catalog.Services[0].Plans {
@@ -124,9 +111,7 @@ func Service(cmd *Commandline) {
 	}
 
 	services, err := sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	for _, service := range services.Resources {
 		if service.GUIDAtTenant == cmd.Options[0] {
@@ -136,9 +121,7 @@ func Service(cmd *Commandline) {
 	}
 
 	services, err = sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	for _, service := range services.Resources {
 		if service.GUIDAtTenant == cmd.Options[0] {
@@ -148,9 +131,7 @@ func Service(cmd *Commandline) {
 				planName = name
 			}
 			lastState, err := sb.LastState(cmd.Options[0])
-			if err != nil {
-				printErr(err)
-			}
+			checkErr(err)
 
 			fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
 			fmt.Printf("Service: %s\n", catalog.Services[0].Name)
@@ -170,23 +151,21 @@ func Service(cmd *Commandline) {
 		}
 	}
 
-	printErr(errors.New("Service instance not found."))
+	checkErr(errors.New("Service instance not found."))
 }
 
 func CreateService(cmd *Commandline) {
 	sb := NewSBClient()
-	fmt.Printf("Creating service at Servicebroker \x1b[36;1m%s\x1b[0m as \x1b[36;1m%s\x1b[0m\n", sb.Host, sb.Username)
+	fmt.Printf("Creating service at Servicebroker %s as %s\n", sb.Host, sb.Username)
 	if len(cmd.Options) != 3 {
-		printErr(errors.New("Missing arguments!"), GetHelpText("CreateService"))
+		checkErr(errors.New("Missing arguments!"), GetHelpText("CreateService"))
 	}
 
 	catalog, err := sb.Catalog()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	if catalog.Services[0].Name != cmd.Options[0] {
-		printErr(errors.New("Service offering not found. Check the marketplace."))
+		checkErr(errors.New("Service offering not found. Check the marketplace."))
 	}
 
 	var planID string
@@ -197,7 +176,7 @@ func CreateService(cmd *Commandline) {
 	}
 
 	if planID == "" {
-		printErr(errors.New("Service plan not found. Check the marketplace."))
+		checkErr(errors.New("Service plan not found. Check the marketplace."))
 	}
 
 	orgID, _ := newUUID()
@@ -211,23 +190,22 @@ func CreateService(cmd *Commandline) {
 	}
 
 	err = sb.Provision(&data, cmd.Options[2])
+	checkErr(err)
 
 	fmt.Printf("OK\n\n")
 
-	fmt.Printf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.\n", cmd.Options[2])
+	fmt.Printf("Create in progress. Use 'sb services' or 'sb service %s' to check operation status.\n", cmd.Options[2])
 }
 
 func DeleteService(cmd *Commandline) {
 	if len(cmd.Options) != 1 {
-		printErr(errors.New("Missing arguments!"), GetHelpText("DeleteService"))
+		checkErr(errors.New("Missing arguments!"), GetHelpText("DeleteService"))
 	}
 
 	sb := NewSBClient()
 
 	instances, err := sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	found := false
 	for _, instance := range instances.Resources {
@@ -238,7 +216,7 @@ func DeleteService(cmd *Commandline) {
 	}
 
 	if !found {
-		printErr(errors.New("Service not found!"))
+		checkErr(errors.New("Service not found!"))
 	}
 
 	if !cmd.Force {
@@ -252,25 +230,27 @@ func DeleteService(cmd *Commandline) {
 		}
 	}
 
-	err = sb.Deprovision(cmd.Options[0])
+	data, err := getServiceIDPlanID(cmd.Options[0])
+	checkErr(err)
+
+	err = sb.Deprovision(data, cmd.Options[0])
+	checkErr(err)
 
 	fmt.Printf("Deleting service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)
 	fmt.Printf("OK\n\n")
 
-	fmt.Printf("Delete in progress. Use 'cf services' or 'cf service %s' to check operation status.\n", cmd.Options[0])
+	fmt.Printf("Delete in progress. Use 'sb services' or 'sb service %s' to check operation status.\n", cmd.Options[0])
 }
 
 func UpdateService(cmd *Commandline) {
 	if len(cmd.Options) != 1 {
-		printErr(errors.New("Missing arguments!"), GetHelpText("UpdateService"))
+		checkErr(errors.New("Missing arguments!"), GetHelpText("UpdateService"))
 	}
 
 	sb := NewSBClient()
 
 	instances, err := sb.Instances()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
 
 	found := false
 	for _, instance := range instances.Resources {
@@ -281,13 +261,14 @@ func UpdateService(cmd *Commandline) {
 	}
 
 	if !found {
-		printErr(errors.New("Service not found!"))
+		checkErr(errors.New("Service not found!"))
 	}
 
 	err = sb.UpdateService(cmd.Options[0])
+	checkErr(err)
 
 	fmt.Printf("Updating service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)
 	fmt.Printf("OK\n\n")
 
-	fmt.Printf("Update in progress. Use 'cf services' or 'cf service %s' to check operation status.\n", cmd.Options[0])
+	fmt.Printf("Update in progress. Use 'sb services' or 'sb service %s' to check operation status.\n", cmd.Options[0])
 }

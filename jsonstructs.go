@@ -69,8 +69,13 @@ type ProvisonPayload struct {
 }
 
 type BindPayload struct {
-	ServiceID string `json:"service_id"`
-	PlanID    string `json:"plan_id"`
+	ServiceID  string      `json:"service_id"`
+	PlanID     string      `json:"plan_id"`
+	Parameters interface{} `json:"parameters"`
+}
+
+type CustomPaylod struct {
+	Parameters interface{} `json:"parameters"`
 }
 
 type SBError struct {

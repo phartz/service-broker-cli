@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/user"
 
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -26,11 +27,21 @@ func getPassword(prompt string) (password string, err error) {
 	return
 }
 
+func getUserHome() string {
+	usr, err := user.Current()
+	checkErr(err)
+	return usr.HomeDir
+}
+
 func getVersionString() string {
 	return fmt.Sprintf("%s+%s", Version, Build)
 }
 
-func printErr(err error, helpTexts ...string) {
+func checkErr(err error, helpTexts ...string) {
+	if err == nil {
+		return
+	}
+
 	fmt.Fprintf(os.Stderr, "error: %v\n", err)
 
 	for _, text := range helpTexts {

@@ -35,9 +35,7 @@ func Target(cmd *Commandline) {
 	} else {
 		sb := NewSBClient(&Credentials{Host: cmd.Options[0]})
 		err := sb.TestConnection()
-		if err != nil {
-			printErr(err)
-		}
+		checkErr(err)
 
 		c.Host = cmd.Options[0]
 		c.Password = ""
@@ -52,31 +50,29 @@ func Target(cmd *Commandline) {
 
 func Auth(cmd *Commandline) {
 	if len(cmd.Options) != 2 {
-		printErr(errors.New("Missing arguments!"), GetHelpText("Auth"))
+		checkErr(errors.New("Missing arguments!"), GetHelpText("Auth"))
 	}
 	conf := Config{}
 	conf.load()
 
 	// check host
 	if conf.Host == "" {
-		printErr(errors.New("No target set."))
+		checkErr(errors.New("No target set."))
 	}
 	fmt.Printf("Target: %s...", conf.Host)
 
 	// check if host is reachable
 	sb := NewSBClient(&Credentials{Host: conf.Host})
 	err := sb.TestConnection()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
+
 	fmt.Printf("OK\n\n")
 
 	fmt.Printf("\nAuthenticating...")
 	sb = NewSBClient(&Credentials{Host: conf.Host, Username: cmd.Options[0], Password: cmd.Options[1]})
 	_, err = sb.Catalog()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
+
 	conf.Username = cmd.Options[0]
 	conf.Password = cmd.Options[1]
 	conf.save()
@@ -90,16 +86,15 @@ func Login(cmd *Commandline) {
 
 	// check host
 	if conf.Host == "" {
-		printErr(errors.New("No target set!"))
+		checkErr(errors.New("No target set!"))
 	}
 	fmt.Printf("Target: %s...", conf.Host)
 
 	// check if host is reachable
 	sb := NewSBClient(&Credentials{Host: conf.Host})
 	err := sb.TestConnection()
-	if err != nil {
-		printErr(err)
-	}
+	checkErr(err)
+
 	fmt.Printf("OK\n\n")
 
 	c := Credentials{Host: conf.Host}

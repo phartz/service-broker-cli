@@ -1,6 +1,6 @@
 BINARY=sb
 
-VERSION=0.0.1
+VERSION=0.0.2
 BUILD=`git log -n 1 | head -n 1 | sed -e 's/^commit //' | head -c 10`
 BUILD_TIME=`date +%Y-%m-%d:%H:%M:%S`
 

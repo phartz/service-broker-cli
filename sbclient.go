@@ -86,19 +86,19 @@ func (s *SBClient) Instances() (*Instances, error) {
 	return i, err
 }
 
-func (s *SBClient) getResultFromBroker(url string, method string, json string) (bytes []byte, statusCode int, status string, err error) {
+func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string) (bytes []byte, statusCode int, status string, err error) {
 	statusCode = 0
 	status = ""
 	bytes = nil
 
-	body := strings.NewReader(json)
+	body := strings.NewReader(jsonStr)
 	target := fmt.Sprintf("%s/%s", s.Host, url)
 
 	if os.Getenv("SB_TRACE") == "ON" {
 		fmt.Println("")
 		fmt.Printf("\tRequest to: %s\n", target)
 		fmt.Printf("\tMethod:     %s\n", method)
-		fmt.Printf("\tBody:\n\t%s\n", json)
+		fmt.Printf("\tBody:\n\t%s\n", jsonStr)
 	}
 
 	req, err := http.NewRequest(method, target, body)
@@ -130,11 +130,18 @@ func (s *SBClient) getResultFromBroker(url string, method string, json string) (
 		fmt.Printf("\tBody:\n\t%s\n", string(bytes))
 	}
 
+	var sbError = new(SBError)
+	tempErr := json.Unmarshal(bytes, &sbError)
+	if (sbError != nil && (sbError.Error != "" || sbError.Description != "")) || tempErr != nil {
+		err = errors.New(fmt.Sprintf("%s / %s", sbError.Description, sbError.Error))
+		return
+	}
+
 	return
 }
 
-func (s *SBClient) Deprovision(instanceID string) error {
-	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "DELETE", "{}")
+func (s *SBClient) Deprovision(data *BindPayload, instanceID string) error {
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s?_id=%s&plan_id=%s", instanceID, data.ServiceID, data.PlanID), "DELETE", "{}")
 	if err != nil {
 		return err
 	}
