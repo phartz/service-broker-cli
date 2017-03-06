@@ -10,7 +10,7 @@ resources:
 
 jobs:
 
-- name: build
+- name: make
   public: true
   plan:
   - get: file-repo
@@ -27,3 +27,32 @@ jobs:
       run:
         path: make
         args: []
+  - task: test-main
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: phartz/hugo
+      inputs:
+        - name: file-repo
+      run:
+        path: go
+        args: 
+          - test
+  - task: test-sbclient
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: phartz/hugo
+      inputs:
+        - name: file-repo
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+        - cd tests
+        - go test
