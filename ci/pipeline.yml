@@ -42,6 +42,7 @@ jobs:
   plan:
   - get: file-repo
     trigger: true
+    passed: [test]
   - task: make
     config:
       platform: linux
