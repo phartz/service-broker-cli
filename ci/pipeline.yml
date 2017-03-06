@@ -1,0 +1,29 @@
+resources:
+- name: file-repo
+  type: git
+  source:
+    branch: master
+    paths: []
+    uri: https://phartz.dedyn.io/gogs/phartz/service-broker-cli
+    username: {{git-username}}
+    password: {{git-password}}
+
+jobs:
+
+- name: build
+  public: true
+  plan:
+  - get: file-repo
+    trigger: true
+  - task: make
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: phartz/hugo
+      inputs:
+        - name: file-repo
+      run:
+        path: make
+        args: []

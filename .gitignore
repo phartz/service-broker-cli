@@ -3,3 +3,4 @@ tmp/
 .sb
 service-broker-cli
 **/*.tgz
+**/credentials.yml
