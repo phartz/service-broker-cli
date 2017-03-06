@@ -4,13 +4,13 @@ resources:
   source:
     branch: master
     paths: []
-    uri: https://phartz.dedyn.io/gogs/phartz/service-broker-cli
+    uri: https://phartz.dedyn.io/gogs/phartz/service-broker-cli.git
     username: {{git-username}}
     password: {{git-password}}
 
 jobs:
 
-- name: make
+- name: test
   public: true
   plan:
   - get: file-repo
@@ -25,22 +25,24 @@ jobs:
       inputs:
         - name: file-repo
       run:
-        path: make
-        args: []
-  - task: test-main
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: phartz/hugo
-      inputs:
-        - name: file-repo
-      run:
-        path: go
+        path: sh
         args: 
-          - test
-  - task: test-sbclient
+          - -exc
+          - |
+            mkdir -p /go/src/phartz.dedyn.io/gogs/phartz
+            cp -R file-repo/ /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            cd /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            go get golang.org/x/crypto/ssh/terminal
+            go test
+            cd tests
+            go test
+
+- name: build
+  public: true
+  plan:
+  - get: file-repo
+    trigger: true
+  - task: make
     config:
       platform: linux
       image_resource:
@@ -51,8 +53,11 @@ jobs:
         - name: file-repo
       run:
         path: sh
-        args:
-        - -exc
-        - |
-        - cd tests
-        - go test
+        args: 
+          - -exc
+          - |
+            mkdir -p /go/src/phartz.dedyn.io/gogs/phartz
+            cp -R file-repo/ /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            cd /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            go get golang.org/x/crypto/ssh/terminal
+            make pipeline_build

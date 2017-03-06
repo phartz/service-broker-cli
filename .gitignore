@@ -4,3 +4,4 @@ tmp/
 service-broker-cli
 **/*.tgz
 **/credentials.yml
+binaries/
