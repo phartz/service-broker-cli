@@ -1,3 +1,10 @@
+resource_types:
+- name: rsync-resource
+  type: docker-image
+  source:
+      repository: phartz/rsync-resource
+      tag: latest
+      
 resources:
 - name: file-repo
   type: git
@@ -7,6 +14,14 @@ resources:
     uri: https://phartz.dedyn.io/gogs/phartz/service-broker-cli.git
     username: {{git-username}}
     password: {{git-password}}
+- name: sync-resource
+  type: rsync-resource
+  source:
+    server: {{target_server}}
+    base_dir: {{target_dir}}
+    user : {{username}}
+    private_key: {{private_key}}
+    disable_version_path: true
 
 jobs:
 
@@ -52,13 +67,22 @@ jobs:
           repository: phartz/hugo
       inputs:
         - name: file-repo
+      outputs:
+        - name: public_output
       run:
         path: sh
         args: 
           - -exc
           - |
+            OUT_PATH=`pwd`
             mkdir -p /go/src/phartz.dedyn.io/gogs/phartz
             cp -R file-repo/ /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
             cd /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
             go get golang.org/x/crypto/ssh/terminal
             make pipeline_build
+            cp -R binaries/* ${OUT_PATH}/public_output
+  - put: sync-resource
+    params: {
+        "sync_dir" : "public_output",
+        "rsync_opts": ["-Pav"]
+    }
