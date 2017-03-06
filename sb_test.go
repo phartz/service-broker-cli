@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"phartz.dedyn.io/gogs/phartz/service-broker-cli/sbcli"
+	"phartz.dedyn.io/gogs/phartz/service-broker-cli/tests"
 )
 
 func TestHelpTexts(t *testing.T) {
@@ -14,14 +17,14 @@ func TestHelpTexts(t *testing.T) {
 			continue
 		}
 
-		text := GetHelpText(command.Name)
-		assertEqual(t, strings.HasPrefix(text, "Sorry"), false, fmt.Sprintf("No help text found for %s", command.Name))
+		text := sbcli.GetHelpText(command.Name)
+		tests.AssertEqual(t, strings.HasPrefix(text, "Sorry"), false, fmt.Sprintf("No help text found for %s", command.Name))
 
 		if command.Shortcut == "" {
 			continue
 		}
 
-		text = GetHelpText(command.Shortcut)
-		assertEqual(t, strings.HasPrefix(text, "Sorry"), false, fmt.Sprintf("No help text found for %s", command.Shortcut))
+		text = sbcli.GetHelpText(command.Shortcut)
+		tests.AssertEqual(t, strings.HasPrefix(text, "Sorry"), false, fmt.Sprintf("No help text found for %s", command.Shortcut))
 	}
 }
