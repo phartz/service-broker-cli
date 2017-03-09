@@ -62,10 +62,23 @@ type LastState struct {
 }
 
 type ProvisonPayload struct {
-	OrganizationGUID string `json:"organization_guid"`
-	PlanID           string `json:"plan_id"`
-	ServiceID        string `json:"service_id"`
-	SpaceGUID        string `json:"space_guid"`
+	OrganizationGUID string      `json:"organization_guid"`
+	PlanID           string      `json:"plan_id"`
+	ServiceID        string      `json:"service_id"`
+	SpaceGUID        string      `json:"space_guid"`
+	Parameters       interface{} `json:"parameters"`
+}
+
+type UpdatePayload struct {
+	ServiceID      string      `json:"service_id"`
+	PlanID         string      `json:"plan_id"`
+	Parameters     interface{} `json:"parameters"`
+	PreviousValues struct {
+		PlanID         string `json:"plan_id"`
+		ServiceID      string `json:"service_id"`
+		OrganizationID string `json:"organization_id"`
+		SpaceID        string `json:"space_id"`
+	} `json:"previous_values"`
 }
 
 type BindPayload struct {

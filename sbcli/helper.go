@@ -66,3 +66,12 @@ func prettyPrintJson(jsonString string) (string, error) {
 	err := json.Indent(&out, []byte(jsonString), "", "  ")
 	return string(out.Bytes()), err
 }
+
+func getJSONFromCustom(str string) interface{} {
+	bytes := []byte("{\"parameters\":" + str + "}")
+	var custom = new(CustomPaylod)
+	err := json.Unmarshal(bytes, &custom)
+	CheckErr(err)
+
+	return custom.Parameters
+}

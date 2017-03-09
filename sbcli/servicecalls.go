@@ -2,6 +2,7 @@ package sbcli
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -189,6 +190,12 @@ func CreateService(cmd *Commandline) {
 		ServiceID:        catalog.Services[0].ID,
 	}
 
+	if cmd.Custom != "" {
+		data.Parameters = getJSONFromCustom(cmd.Custom)
+	}
+
+	payloadBytes, err := json.Marshal(data)
+	fmt.Printf(string(payloadBytes))
 	err = sb.Provision(&data, cmd.Options[2])
 	CheckErr(err)
 

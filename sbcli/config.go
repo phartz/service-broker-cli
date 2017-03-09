@@ -53,7 +53,7 @@ func getConfig() (string, error) {
 
 	if err != nil {
 		config, err = findConfig(getUserHome(), false)
-		CheckErr(err)
+		return "", err
 	}
 
 	return filepath.Join(config, ConfigFile), nil
