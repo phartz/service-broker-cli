@@ -10,6 +10,28 @@ import (
 	"text/tabwriter"
 )
 
+// Get plan ID from plan name
+func getPlanID(planName string, serviceID string) (string, error) {
+	sb := NewSBClient()
+	catalog, err := sb.Catalog()
+	CheckErr(err)
+
+	// find service in catalog and look for plan name
+	for _, service := range catalog.Services {
+		if service.ID != serviceID {
+			continue
+		}
+
+		for _, plan := range service.Plans {
+			if plan.Name == planName {
+				return plan.ID, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Plan %s not found.", planName)
+}
+
 // retreieves all service instances from the service broker
 func Services(cmd *Commandline) {
 	sb := NewSBClient()
@@ -18,26 +40,31 @@ func Services(cmd *Commandline) {
 	catalog, err := sb.Catalog()
 	CheckErr(err)
 
-	plans := make(map[string]string)
-	for _, plan := range catalog.Services[0].Plans {
-		plans[plan.ID] = plan.Name
+	// make a map for each service which contains the available plans
+	plans := make(map[string]map[string]string)
+	for _, service := range catalog.Services {
+		plans[service.ID] = make(map[string]string)
+		for _, plan := range service.Plans {
+			plans[service.ID][plan.ID] = plan.Name
+		}
 	}
 
+	// first iterate over all service instances and update the status
 	services, err := sb.Instances()
 	CheckErr(err)
-
-	// update states
 	for _, service := range services.Resources {
 		if service.State == "deleted" {
 			continue
 		}
-
 		_, _ = sb.LastState(service.GUIDAtTenant)
 	}
+
 	services, err = sb.Instances()
 	CheckErr(err)
 
 	fmt.Printf("OK\n\n")
+
+	// start writing service infos to the console
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation")
 	for _, service := range services.Resources {
@@ -46,8 +73,10 @@ func Services(cmd *Commandline) {
 		}
 
 		planName := "unknown"
-		if name, found := plans[service.PlanGUID]; found {
-			planName = name
+		if _, found := plans[service.ServiceGUID]; found {
+			if name, found := plans[service.ServiceGUID][service.PlanGUID]; found {
+				planName = name
+			}
 		}
 
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalog.Services[0].Name, planName, "unknown", service.State)
@@ -81,7 +110,7 @@ func Marketplace(cmd *Commandline) {
 	fmt.Println("")
 }
 
-func getServiceIDPlanID(servicename string) (*BindPayload, error) {
+func getServiceIDPlanID(servicename string) (*ProvisonPayload, error) {
 	sb := NewSBClient()
 
 	services, err := sb.Instances()
@@ -89,7 +118,7 @@ func getServiceIDPlanID(servicename string) (*BindPayload, error) {
 
 	for _, service := range services.Resources {
 		if service.GUIDAtTenant == servicename {
-			return &BindPayload{ServiceID: service.ServiceGUID, PlanID: service.PlanGUID}, nil
+			return &ProvisonPayload{ServiceID: service.ServiceGUID, PlanID: service.PlanGUID, SpaceGUID: service.Metadata.SpaceGUID, OrganizationGUID: service.Metadata.OrganizationGUID}, nil
 		}
 	}
 
@@ -240,7 +269,9 @@ func DeleteService(cmd *Commandline) {
 	data, err := getServiceIDPlanID(cmd.Options[0])
 	CheckErr(err)
 
-	err = sb.Deprovision(data, cmd.Options[0])
+	payload := BindPayload{ServiceID: data.ServiceID, PlanID: data.PlanID}
+
+	err = sb.Deprovision(&payload, cmd.Options[0])
 	CheckErr(err)
 
 	fmt.Printf("Deleting service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)
@@ -271,7 +302,28 @@ func UpdateService(cmd *Commandline) {
 		CheckErr(errors.New("Service not found!"))
 	}
 
-	err = sb.UpdateService(cmd.Options[0])
+	data, err := getServiceIDPlanID(cmd.Options[0])
+	CheckErr(err)
+
+	var payload = UpdatePayload{ServiceID: data.ServiceID, PlanID: data.PlanID}
+
+	payload.PreviousValues.ServiceID = data.ServiceID
+	payload.PreviousValues.PlanID = data.PlanID
+	payload.PreviousValues.OrganizationID = data.OrganizationGUID
+	payload.PreviousValues.SpaceID = data.SpaceGUID
+
+	if cmd.Plan != "" {
+		planID, err := getPlanID(cmd.Plan, data.ServiceID)
+		CheckErr(err)
+
+		payload.PlanID = planID
+	}
+
+	if cmd.Custom != "" {
+		payload.Parameters = getJSONFromCustom(cmd.Custom)
+	}
+
+	err = sb.UpdateService(&payload, cmd.Options[0])
 	CheckErr(err)
 
 	fmt.Printf("Updating service %s at %s as %s...\n", cmd.Options[0], sb.Host, sb.Username)

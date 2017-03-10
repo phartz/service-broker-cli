@@ -27,7 +27,13 @@ func CreateServiceKey(cmd *Commandline) {
 	data, err := getServiceIDPlanID(cmd.Options[0])
 	CheckErr(err)
 
-	result, err := sb.Bind(data, cmd.Options[0], cmd.Options[1])
+	var payload = BindPayload{PlanID: data.PlanID, ServiceID: data.ServiceID}
+
+	if cmd.Custom != "" {
+		payload.Parameters = getJSONFromCustom(cmd.Custom)
+	}
+
+	result, err := sb.Bind(&payload, cmd.Options[0], cmd.Options[1])
 	CheckErr(err)
 
 	if !cmd.JSON {
@@ -88,7 +94,9 @@ func DeleteServiceKey(cmd *Commandline) {
 	data, err := getServiceIDPlanID(cmd.Options[0])
 	CheckErr(err)
 
-	err = sb.UnBind(data, cmd.Options[0], cmd.Options[1])
+	var payload = BindPayload{PlanID: data.PlanID, ServiceID: data.ServiceID}
+
+	err = sb.UnBind(&payload, cmd.Options[0], cmd.Options[1])
 	CheckErr(err)
 
 	fmt.Println("OK\n")

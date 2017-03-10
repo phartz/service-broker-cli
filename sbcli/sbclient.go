@@ -153,8 +153,10 @@ func (s *SBClient) Deprovision(data *BindPayload, instanceID string) error {
 	return errors.New(fmt.Sprintf("Deprovision failure code: %d/%s", statusCode, status))
 }
 
-func (s *SBClient) UpdateService(instanceID string) error {
-	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PATCH", "{}")
+func (s *SBClient) UpdateService(data *UpdatePayload, instanceID string) error {
+	bytes, _ := json.Marshal(data)
+
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PATCH", string(bytes))
 	if err != nil {
 		return err
 	}

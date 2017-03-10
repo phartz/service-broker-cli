@@ -29,8 +29,7 @@ func GetHelpText(command string) string {
 			"   cs\n" +
 			"\n" +
 			"OPTIONS:\n" +
-			"   -c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n" +
-			"   -t      User provided tags\n"
+			"   -c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n"
 	case "update-service":
 		return "NAME:\n" +
 			"   update-service - Update a service instance\n" +
@@ -49,8 +48,7 @@ func GetHelpText(command string) string {
 			"\n" +
 			"OPTIONS:\n" +
 			"   -c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.\n" +
-			"   -p      Change service plan for a service instance\n" +
-			"   -t      User provided tags\n"
+			"   -p      Change service plan for a service instance\n"
 	case "delete-service", "ds":
 		return "NAME:\n" +
 			"   delete-service - Delete a service instance\n" +

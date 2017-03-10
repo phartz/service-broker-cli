@@ -4,6 +4,7 @@ type InstanceResource struct {
 	ID            int          `json:"id"`
 	PlanGUID      string       `json:"plan_guid"`
 	ServiceGUID   string       `json:"service_guid"`
+	Metadata      Metadata     `json:"metadata"`
 	DashboardURL  interface{}  `json:"dashboard_url"`
 	State         string       `json:"state"`
 	GUIDAtTenant  string       `json:"guid_at_tenant"`
@@ -13,6 +14,15 @@ type InstanceResource struct {
 	CreatedAt     string       `json:"created_at"`
 	UpdatedAt     string       `json:"updated_at"`
 	Credentials   []Credential `json:"credentials"`
+}
+
+type Metadata struct {
+	InstanceGUIDAtTenant string      `json:"instance_guid_at_tenant"`
+	UserParams           interface{} `json:"user_params"`
+	PlanGUID             string      `json:"plan_guid"`
+	TenantID             string      `json:"tenant_id"`
+	OrganizationGUID     string      `json:"organization_guid"`
+	SpaceGUID            string      `json:"space_guid"`
 }
 
 type Credential struct {
@@ -70,15 +80,17 @@ type ProvisonPayload struct {
 }
 
 type UpdatePayload struct {
-	ServiceID      string      `json:"service_id"`
-	PlanID         string      `json:"plan_id"`
-	Parameters     interface{} `json:"parameters"`
-	PreviousValues struct {
-		PlanID         string `json:"plan_id"`
-		ServiceID      string `json:"service_id"`
-		OrganizationID string `json:"organization_id"`
-		SpaceID        string `json:"space_id"`
-	} `json:"previous_values"`
+	ServiceID      string               `json:"service_id"`
+	PlanID         string               `json:"plan_id"`
+	Parameters     interface{}          `json:"parameters"`
+	PreviousValues PreviousUpdateValues `json:"previous_values"`
+}
+
+type PreviousUpdateValues struct {
+	PlanID         string `json:"plan_id"`
+	ServiceID      string `json:"service_id"`
+	OrganizationID string `json:"organization_id"`
+	SpaceID        string `json:"space_id"`
 }
 
 type BindPayload struct {
