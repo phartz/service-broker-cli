@@ -76,7 +76,13 @@ In contrast to to CloudFounndry CLI the `sb create-service-key` returns the cred
 * The service broker also doesn't store any information about the real service names, the broker only works with UUIDs.
 
 
-## Log In
+## Target and log In
+
+Use `sb target` to target a Service Broker.
+
+```bash
+$ sb target http://localhost:3000 
+```
 
 To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting. 
 
