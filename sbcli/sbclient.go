@@ -141,7 +141,7 @@ func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string
 }
 
 func (s *SBClient) Deprovision(data *BindPayload, instanceID string) error {
-	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s?_id=%s&plan_id=%s", instanceID, data.ServiceID, data.PlanID), "DELETE", "{}")
+	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s?service_id=%s&plan_id=%s", instanceID, data.ServiceID, data.PlanID), "DELETE", "{}")
 	if err != nil {
 		return err
 	}
