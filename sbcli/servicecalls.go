@@ -41,8 +41,10 @@ func Services(cmd *Commandline) {
 	CheckErr(err)
 
 	// make a map for each service which contains the available plans
+	serviceNames := make(map[string]string)
 	plans := make(map[string]map[string]string)
 	for _, service := range catalog.Services {
+		serviceNames[service.ID] = service.Name
 		plans[service.ID] = make(map[string]string)
 		for _, plan := range service.Plans {
 			plans[service.ID][plan.ID] = plan.Name
@@ -79,7 +81,8 @@ func Services(cmd *Commandline) {
 			}
 		}
 
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalog.Services[0].Name, planName, "unknown", service.State)
+		// ToDo ... name will be wrong --> catalog.Services[0].Name
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, serviceNames[service.ServiceGUID], planName, "unknown", service.State)
 	}
 	w.Flush()
 	fmt.Println("")
