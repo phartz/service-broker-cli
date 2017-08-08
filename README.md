@@ -1,5 +1,5 @@
 # Service-Broker-CLI
-Service Broker CLI is a commandline to to interact with a cloud foundry like service broker.
+Service Broker CLI is a commandline tool to interact with a cloud foundry like service broker.
 It was written to reduce to time to test changes on a service broker in the development phase.
 
 ## Table of Content
