@@ -10,6 +10,7 @@ This documentation contains the following topics.
 * [Restrictions](##Restrictions)
 * [Log In](##Log-In)
 * [Logging](##Logging)
+* [CI Pipeline](##ci-pipeline)
 
 ## Download, Build and Install
 Service broker cli is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
@@ -106,6 +107,6 @@ Service-Broker-CLI does not provide a logging in the classical sense. But you ca
 $ SB_TRACE=ON && sb services
 ```
 
-## CI pipeline
+## CI Pipeline
 
-The CI pipeline can be found [here](https://phartz.dedyn.io/teams/main/pipelines/service-broker-cli)
+A [concourse](concourse.ci) based CI pipeline can be found [here](https://phartz.dedyn.io/teams/main/pipelines/service-broker-cli)
