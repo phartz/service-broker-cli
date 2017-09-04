@@ -4,14 +4,14 @@ resource_types:
   source:
       repository: phartz/rsync-resource
       tag: latest
-      
+
 resources:
 - name: file-repo
   type: git
   source:
     branch: master
     paths: []
-    uri: https://phartz.dedyn.io/gogs/phartz/service-broker-cli.git
+    uri: git@github.com:phartz/service-broker-cli.git
     username: {{git-username}}
     password: {{git-password}}
 - name: sync-resource
@@ -41,12 +41,12 @@ jobs:
         - name: file-repo
       run:
         path: sh
-        args: 
+        args:
           - -exc
           - |
-            mkdir -p /go/src/phartz.dedyn.io/gogs/phartz
-            cp -R file-repo/ /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
-            cd /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            mkdir -p /go/src/github.com/phartz
+            cp -R file-repo/ /go/src/github.com/phartz/service-broker-cli
+            cd /go/src/github.com/phartz/service-broker-cli
             go get golang.org/x/crypto/ssh/terminal
             go test
             cd tests
@@ -71,13 +71,13 @@ jobs:
         - name: public_output
       run:
         path: sh
-        args: 
+        args:
           - -exc
           - |
             OUT_PATH=`pwd`
-            mkdir -p /go/src/phartz.dedyn.io/gogs/phartz
-            cp -R file-repo/ /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
-            cd /go/src/phartz.dedyn.io/gogs/phartz/service-broker-cli
+            mkdir -p /go/src/github.com/phartz
+            cp -R file-repo/ /go/src/github.com/phartz/service-broker-cli
+            cd /go/src/github.com/phartz/service-broker-cli
             go get golang.org/x/crypto/ssh/terminal
             make pipeline_build
             cp -R binaries/* ${OUT_PATH}/public_output

@@ -16,7 +16,7 @@ Service broker cli is written in [`golang`](https://golang.org). It is designed 
 
 It provides also a Makefile, so it's quite easy to build and install.
 
-Downlad the repo with `go get phartz.dedyn.io/gogs/phartz/service-broker-cli` then change the current path to the sources `cd $GOPATH/src/phartz.dedyn.io/gogs/phartz/service-broker-cli`.
+Downlad the repo with `go get github.com/phartz/service-broker-cli` then change the current path to the sources `cd $GOPATH/src/github.com/phartz/service-broker-cli`.
 
 Build
 ```
@@ -71,7 +71,7 @@ To get specific help use `sb help <command>`
 ## Restrictions
 
 There are some restrictions:
-* The service broker doesn't store any user crendetials so it is not possible to get information about a service key. 
+* The service broker doesn't store any user crendetials so it is not possible to get information about a service key.
 In contrast to to CloudFounndry CLI the `sb create-service-key` returns the credentials.
 * The service broker also doesn't store any information about the real service names, the broker only works with UUIDs.
 
@@ -81,10 +81,10 @@ In contrast to to CloudFounndry CLI the `sb create-service-key` returns the cred
 Use `sb target` to target a Service Broker.
 
 ```bash
-$ sb target http://localhost:3000 
+$ sb target http://localhost:3000
 ```
 
-To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting. 
+To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting.
 
 The credentials will be stored in json format in the file `.sb`. Those file can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
@@ -99,10 +99,9 @@ The credentials will be stored in json format in the file `.sb`. Those file can 
 ```
 
 ## Logging
- 
+
 Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service-Broker API requests and answers.
 
 ```
 $ SB_TRACE=ON && sb services
-``` 
- 
+```

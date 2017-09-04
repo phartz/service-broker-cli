@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"phartz.dedyn.io/gogs/phartz/service-broker-cli/sbcli"
+	"github.com/phartz/service-broker-cli/sbcli"
 )
 
 func TestSBErrorTexts(t *testing.T) {

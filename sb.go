@@ -5,7 +5,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"phartz.dedyn.io/gogs/phartz/service-broker-cli/sbcli"
+	"github.com/phartz/service-broker-cli/sbcli"
 )
 
 // Slice which stores the registered commands

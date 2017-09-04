@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"phartz.dedyn.io/gogs/phartz/service-broker-cli/sbcli"
-	"phartz.dedyn.io/gogs/phartz/service-broker-cli/tests"
+	"github.com/phartz/service-broker-cli/sbcli"
+	"github.com/phartz/service-broker-cli/tests"
 )
 
 func TestHelpTexts(t *testing.T) {

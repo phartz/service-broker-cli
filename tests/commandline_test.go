@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"phartz.dedyn.io/gogs/phartz/service-broker-cli/sbcli"
+	"github.com/phartz/service-broker-cli/sbcli"
 )
 
 func TestCmd(t *testing.T) {
