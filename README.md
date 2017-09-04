@@ -1,8 +1,8 @@
 # Service Broker CLI
-Service Broker CLI is a commandline tool to interact with a cloud foundry like service broker.
-It was written to reduce to time to test changes on a service broker in the development phase.
+Service Broker CLI is a command-line tool to interact with a Cloud Foundry like Service Broker.
+It was written to reduce to time to test changes on a Service Broker in the development phase.
 
-## Table of Content
+## Table of Contents
 This documentation contains the following topics.
 
 * [Download, Build and Install](##Download-Build-and-Install)
@@ -13,11 +13,11 @@ This documentation contains the following topics.
 * [CI Pipeline](##ci-pipeline)
 
 ## Download, Build and Install
-Service Broker CLI is written in [`golang`](https://golang.org). It is designed to use only standard libraries.
+Service Broker CLI is written in [`Go`](https://golang.org). It is designed to use only standard libraries.
 
 It provides also a Makefile, so it's quite easy to build and install.
 
-Downlad the repo with `go get github.com/phartz/service-broker-cli` then change the current path to the sources `cd $GOPATH/src/github.com/phartz/service-broker-cli`.
+Downlad the repo with `go get github.com/phartz/service-broker-cli`, then change the current path to the sources `cd $GOPATH/src/github.com/phartz/service-broker-cli`.
 
 Build
 ```
@@ -72,9 +72,9 @@ To get specific help use `sb help <command>`
 ## Restrictions
 
 There are some restrictions:
-* The service broker doesn't store any user crendetials so it is not possible to get information about a service key.
-In contrast to to CloudFounndry CLI the `sb create-service-key` returns the credentials.
-* The service broker also doesn't store any information about the real service names, the broker only works with UUIDs.
+* The Service Broker doesn't store any user credentials so it is not possible to get information about a service key.
+In contrast to to Cloud Foundry CLI the `sb create-service-key` returns the credentials.
+* The Service Broker also doesn't store any information about the real service names. The broker only works with UUIDs.
 
 
 ## Target and log In
@@ -87,7 +87,7 @@ $ sb target http://localhost:3000
 
 To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting.
 
-The credentials will be stored in json format in the file `.sb`. Those file can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
+The credentials will be stored in JSON format in the file `.sb`. Those files can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
 ```
 --> /some/where/on/your/disk
@@ -101,7 +101,7 @@ The credentials will be stored in json format in the file `.sb`. Those file can 
 
 ## Logging
 
-Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service-Broker API requests and answers.
+Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service Broker API requests and answers.
 
 ```
 $ SB_TRACE=ON && sb services
