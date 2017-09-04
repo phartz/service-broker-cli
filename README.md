@@ -105,3 +105,7 @@ Service-Broker-CLI does not provide a logging in the classical sense. But you ca
 ```
 $ SB_TRACE=ON && sb services
 ```
+
+## CI pipeline
+
+The CI pipeline can be found [here](https://phartz.dedyn.io/teams/main/pipelines/service-broker-cli)
