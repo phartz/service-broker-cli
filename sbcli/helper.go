@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"regexp"
+	"strings"
 
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -25,6 +27,22 @@ func getPassword(prompt string) (password string, err error) {
 		log.Fatal(err)
 	}
 	return
+}
+
+func CleanTargetURI(uri string) string {
+	// check port
+	re := regexp.MustCompile(`:\d+\z`)
+	if re.FindString(uri) == "" {
+		uri = fmt.Sprintf("%s:3000", uri)
+	}
+
+	// check scheme, if no scheme was given, expect https
+	re = regexp.MustCompile(`\A(http://)|(https://)`)
+	if re.FindString(strings.ToLower(uri)) == "" {
+		uri = fmt.Sprintf("http://%s", uri)
+	}
+
+	return uri
 }
 
 func getUserHome() string {

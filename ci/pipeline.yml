@@ -11,9 +11,7 @@ resources:
   source:
     branch: master
     paths: []
-    uri: git@github.com:phartz/service-broker-cli.git
-    username: {{git-username}}
-    password: {{git-password}}
+    uri: https://github.com/phartz/service-broker-cli.git
 - name: sync-resource
   type: rsync-resource
   source:
