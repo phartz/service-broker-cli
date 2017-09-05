@@ -33,11 +33,12 @@ func Target(cmd *Commandline) {
 			fmt.Println("User:         %s", c.Username)
 		}
 	} else {
-		sb := NewSBClient(&Credentials{Host: cmd.Options[0]})
+		host := CleanTargetURI(cmd.Options[0])
+		sb := NewSBClient(&Credentials{Host: host})
 		err := sb.TestConnection()
 		CheckErr(err)
 
-		c.Host = cmd.Options[0]
+		c.Host = host
 		c.Password = ""
 		c.Username = ""
 		c.save()
