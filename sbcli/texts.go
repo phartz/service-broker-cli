@@ -158,7 +158,10 @@ func GetHelpText(command string) string {
 			"   sb services\n" +
 			"\n" +
 			"ALIAS:\n" +
-			"   s\n"
+			"   s\n" +
+			"\n" +
+			"OPTIONS:\n" +
+			"   --no-filter      Returns also the deleted instances.\n"
 	case "service":
 		return "NAME:\n" +
 			"   service - Show service instance info\n" +
