@@ -67,7 +67,7 @@ func Services(cmd *Commandline) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation")
 	for _, service := range services.Resources {
-		if service.State == "deleted" {
+		if service.State == "deleted" && cmd.NoFilter == false {
 			continue
 		}
 

@@ -16,6 +16,7 @@ type Commandline struct {
 	Tags       string
 	Custom     string
 	JSON       bool
+	NoFilter   bool
 }
 
 func (c *Commandline) Parse(options []string) (err error) {
@@ -58,6 +59,7 @@ func (c *Commandline) Parse(options []string) (err error) {
 	tags := flagSet.String("t", "", "")
 	custom := flagSet.String("c", "", "")
 	json := flagSet.Bool("j", false, "")
+	noFilter := flagSet.Bool("no-filter", false, "")
 
 	flagSet.Parse(options[flagPos:])
 	c.Force = *force
@@ -65,6 +67,7 @@ func (c *Commandline) Parse(options []string) (err error) {
 	c.Tags = *tags
 	c.Custom = c.checkCustom(*custom)
 	c.JSON = *json
+	c.NoFilter = *noFilter
 
 	return
 }
