@@ -134,15 +134,12 @@ func GetHelpText(command string) string {
 			"\n" +
 			"ALIAS:\n" +
 			"   lo\n"
-	case "target", "t":
+	case "api", "t":
 		return "NAME:\n" +
-			"   target - Set or view the target\n" +
+			"   api - Set or view the api\n" +
 			"\n" +
 			"USAGE:\n" +
-			"   sb target [-o ORG] [-s SPACE]\n" +
-			"\n" +
-			"ALIAS:\n" +
-			"   t\n"
+			"   sb api\n"
 	case "marketplace", "m":
 		return "NAME:\n" +
 			"   marketplace - List available offerings in the marketplace\n" +
@@ -154,7 +151,7 @@ func GetHelpText(command string) string {
 			"   m\n"
 	case "services", "s":
 		return "NAME:\n" +
-			"   services - List all service instances in the target space\n" +
+			"   services - List all service instances\n" +
 			"\n" +
 			"USAGE:\n" +
 			"   sb services\n" +
