@@ -186,7 +186,17 @@ func Service(cmd *Commandline) {
 func CreateService(cmd *Commandline) {
 	sb := NewSBClient()
 	fmt.Printf("Creating service at Servicebroker %s as %s\n", sb.Host, sb.Username)
-	if len(cmd.Options) != 3 {
+
+	serviceName := ""
+
+	switch len(cmd.Options) {
+	case 2:
+		// We will create a UUID as a servicename
+		serviceName = GetUUID()
+		fmt.Printf("\nNo service name give, create uuid instead: %s\n", serviceName)
+	case 3:
+		serviceName = cmd.Options[2]
+	default:
 		CheckErr(errors.New("Missing arguments!"), GetHelpText("CreateService"))
 	}
 
@@ -222,12 +232,12 @@ func CreateService(cmd *Commandline) {
 		data.Parameters = getJSONFromCustom(cmd.Custom)
 	}
 
-	err = sb.Provision(&data, cmd.Options[2])
+	err = sb.Provision(&data, serviceName)
 	CheckErr(err)
 
 	fmt.Printf("OK\n\n")
 
-	fmt.Printf("Create in progress. Use 'sb services' or 'sb service %s' to check operation status.\n", cmd.Options[2])
+	fmt.Printf("Create in progress. Use 'sb services' or 'sb service %s' to check operation status.\n", serviceName)
 }
 
 func DeleteService(cmd *Commandline) {

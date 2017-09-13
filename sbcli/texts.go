@@ -14,7 +14,9 @@ func GetHelpText(command string) string {
 			"   create-service - Create a service instance\n" +
 			"\n" +
 			"USAGE:\n" +
-			"   sb create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]\n" +
+			"   sb create-service SERVICE PLAN [SERVICE_INSTANCE] [-c PARAMETERS_AS_JSON] [-t TAGS]\n" +
+			"\n" +
+			"   If no service name (SERVICE_INSTANCE) is given a UUID will be generated.\n" +
 			"\n" +
 			"   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n" +
 			"\n" +
