@@ -29,8 +29,8 @@ func Api(cmd *Commandline) {
 		if c.Host == "" {
 			fmt.Printf("No api endpoint set!\n")
 		} else {
-			fmt.Println("API endpoint: %s", c.Host)
-			fmt.Println("User:         %s", c.Username)
+			fmt.Printf("API endpoint: %s\n", c.Host)
+			fmt.Printf("User:         %s\n", c.Username)
 		}
 	} else {
 		host := CleanTargetURI(cmd.Options[0])
