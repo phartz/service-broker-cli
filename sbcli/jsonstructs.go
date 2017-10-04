@@ -72,11 +72,12 @@ type LastState struct {
 }
 
 type ProvisonPayload struct {
-	OrganizationGUID string      `json:"organization_guid"`
-	PlanID           string      `json:"plan_id"`
-	ServiceID        string      `json:"service_id"`
-	SpaceGUID        string      `json:"space_guid"`
-	Parameters       interface{} `json:"parameters"`
+	OrganizationGUID string        `json:"organization_guid"`
+	PlanID           string        `json:"plan_id"`
+	ServiceID        string        `json:"service_id"`
+	SpaceGUID        string        `json:"space_guid"`
+	Parameters       interface{}   `json:"parameters"`
+	Context          ContextPaylod `json:"context"`
 }
 
 type UpdatePayload struct {
@@ -84,6 +85,12 @@ type UpdatePayload struct {
 	PlanID         string               `json:"plan_id"`
 	Parameters     interface{}          `json:"parameters"`
 	PreviousValues PreviousUpdateValues `json:"previous_values"`
+	Context        ContextPaylod        `json:"context"`
+}
+
+type ContextPaylod struct {
+	OrganizationID string `json:"organization_id"`
+	SpaceID        string `json:"space_id"`
 }
 
 type PreviousUpdateValues struct {
