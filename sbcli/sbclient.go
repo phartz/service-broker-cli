@@ -90,7 +90,6 @@ func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string
 	statusCode = 0
 	status = ""
 	bytes = nil
-
 	body := strings.NewReader(jsonStr)
 	target := fmt.Sprintf("%s/%s", s.Host, url)
 
@@ -126,6 +125,7 @@ func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string
 
 	bytes, err = ioutil.ReadAll(resp.Body)
 	if os.Getenv("SB_TRACE") == "ON" {
+		fmt.Println("\tResult:")
 		fmt.Printf("\tStatus: %d/%s\n", resp.StatusCode, resp.Status)
 		fmt.Printf("\tBody:\n\t%s\n", string(bytes))
 	}
@@ -157,6 +157,7 @@ func (s *SBClient) UpdateService(data *UpdatePayload, instanceID string) error {
 	bytes, _ := json.Marshal(data)
 
 	_, statusCode, status, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s", instanceID), "PATCH", string(bytes))
+
 	if err != nil {
 		return err
 	}

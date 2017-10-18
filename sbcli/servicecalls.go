@@ -117,7 +117,10 @@ func getServiceIDPlanID(servicename string) (*ProvisonPayload, error) {
 
 	for _, service := range services.Resources {
 		if service.GUIDAtTenant == servicename {
-			return &ProvisonPayload{ServiceID: service.ServiceGUID, PlanID: service.PlanGUID, SpaceGUID: service.Metadata.SpaceGUID, OrganizationGUID: service.Metadata.OrganizationGUID}, nil
+			payload := ProvisonPayload{ServiceID: service.ServiceGUID, PlanID: service.PlanGUID, SpaceGUID: service.Metadata.SpaceGUID, OrganizationGUID: service.Metadata.OrganizationGUID}
+			payload.Context.OrganizationID = service.Metadata.OrganizationGUID
+			payload.Context.SpaceID = service.Metadata.SpaceGUID
+			return &payload, nil
 		}
 	}
 
@@ -228,6 +231,9 @@ func CreateService(cmd *Commandline) {
 		ServiceID:        catalog.Services[0].ID,
 	}
 
+	data.Context.OrganizationID = orgID
+	data.Context.SpaceID = spaceID
+
 	if cmd.Custom != "" {
 		data.Parameters = getJSONFromCustom(cmd.Custom)
 	}
@@ -318,6 +324,8 @@ func UpdateService(cmd *Commandline) {
 	payload.PreviousValues.PlanID = data.PlanID
 	payload.PreviousValues.OrganizationID = data.OrganizationGUID
 	payload.PreviousValues.SpaceID = data.SpaceGUID
+	payload.Context.OrganizationID = data.OrganizationGUID
+	payload.Context.SpaceID = data.SpaceGUID
 
 	if cmd.Plan != "" {
 		planID, err := getPlanID(cmd.Plan, data.ServiceID)
