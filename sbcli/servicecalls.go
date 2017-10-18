@@ -48,6 +48,11 @@ func Services(cmd *Commandline) {
 		}
 	}
 
+	catalogService := make(map[string]CatalogService)
+	for _, service := range catalog.Services {
+		catalogService[service.ID] = service
+	}
+
 	// first iterate over all service instances and update the status
 	services, err := sb.Instances()
 	CheckErr(err)
@@ -78,7 +83,7 @@ func Services(cmd *Commandline) {
 			}
 		}
 
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalog.Services[0].Name, planName, "unknown", service.State)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalogService[service.ServiceGUID].Name, planName, "./.", service.State)
 	}
 	w.Flush()
 	fmt.Println("")
@@ -138,8 +143,16 @@ func Service(cmd *Commandline) {
 	CheckErr(err)
 
 	plans := make(map[string]string)
-	for _, plan := range catalog.Services[0].Plans {
-		plans[plan.ID] = plan.Name
+
+	for _, service := range catalog.Services {
+		for _, plan := range service.Plans {
+			plans[plan.ID] = plan.Name
+		}
+	}
+
+	catalogService := make(map[string]CatalogService)
+	for _, service := range catalog.Services {
+		catalogService[service.ID] = service
 	}
 
 	services, err := sb.Instances()
@@ -166,11 +179,11 @@ func Service(cmd *Commandline) {
 			CheckErr(err)
 
 			fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
-			fmt.Printf("Service: %s\n", catalog.Services[0].Name)
-			fmt.Printf("Bound apps: %s\n", "unknown")
-			fmt.Printf("Tags:%s\n", strings.Join(catalog.Services[0].Tags, ", "))
+			fmt.Printf("Service: %s\n", catalogService[service.ServiceGUID].Name)
+			fmt.Printf("Bound apps: %s\n", "./.")
+			fmt.Printf("Tags:%s\n", strings.Join(catalogService[service.ServiceGUID].Tags, ", "))
 			fmt.Printf("Plan: %s\n", planName)
-			fmt.Printf("Description: %s\n", catalog.Services[0].Description)
+			fmt.Printf("Description: %s\n", catalogService[service.ServiceGUID].Description)
 			fmt.Printf("Documentation url: \n")
 			fmt.Printf("Dashboard: \n")
 			fmt.Printf("\n")
@@ -206,12 +219,21 @@ func CreateService(cmd *Commandline) {
 	catalog, err := sb.Catalog()
 	CheckErr(err)
 
-	if catalog.Services[0].Name != cmd.Options[0] {
+	serviceID := -1
+
+	for i := 0; i < len(catalog.Services); i++ {
+		if catalog.Services[i].Name == cmd.Options[0] {
+			serviceID = i
+			break
+		}
+	}
+
+	if serviceID == -1 {
 		CheckErr(errors.New("Service offering not found. Check the marketplace."))
 	}
 
 	var planID string
-	for _, plan := range catalog.Services[0].Plans {
+	for _, plan := range catalog.Services[serviceID].Plans {
 		if cmd.Options[1] == plan.Name {
 			planID = plan.ID
 		}
@@ -228,7 +250,7 @@ func CreateService(cmd *Commandline) {
 		PlanID:           planID,
 		OrganizationGUID: orgID,
 		SpaceGUID:        spaceID,
-		ServiceID:        catalog.Services[0].ID,
+		ServiceID:        catalog.Services[serviceID].ID,
 	}
 
 	data.Context.OrganizationID = orgID
