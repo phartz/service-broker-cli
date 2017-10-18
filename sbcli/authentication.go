@@ -21,16 +21,16 @@ func Logout(cmd *Commandline) {
 	fmt.Println("OK")
 }
 
-func Target(cmd *Commandline) {
+func Api(cmd *Commandline) {
 	c := Config{}
 	c.load()
 
 	if len(cmd.Options) == 0 {
 		if c.Host == "" {
-			fmt.Printf("No target set!\n")
+			fmt.Printf("No api endpoint set!\n")
 		} else {
-			fmt.Println("API endpoint: %s", c.Host)
-			fmt.Println("User:         %s", c.Username)
+			fmt.Printf("API endpoint: %s\n", c.Host)
+			fmt.Printf("User:         %s\n", c.Username)
 		}
 	} else {
 		host := CleanTargetURI(cmd.Options[0])

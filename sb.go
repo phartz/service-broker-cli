@@ -50,7 +50,7 @@ func registerCommands() {
 	// register commands
 	addCommand("help", "h", "Show help", Help)
 	addCommand("", "", "", nil)
-	addCommand("target", "t", "Sets or gets the target", sbcli.Target)
+	addCommand("api", "", "Sets or gets the api", sbcli.Api)
 	addCommand("login", "l", "Login to the target", sbcli.Login)
 	addCommand("logout", "lo", "Logout from the target", sbcli.Logout)
 	addCommand("auth", "", "Authenticate to the target", sbcli.Auth)

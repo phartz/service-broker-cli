@@ -14,7 +14,9 @@ func GetHelpText(command string) string {
 			"   create-service - Create a service instance\n" +
 			"\n" +
 			"USAGE:\n" +
-			"   sb create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]\n" +
+			"   sb create-service SERVICE PLAN [SERVICE_INSTANCE] [-c PARAMETERS_AS_JSON] [-t TAGS]\n" +
+			"\n" +
+			"   If no service name (SERVICE_INSTANCE) is given a UUID will be generated.\n" +
 			"\n" +
 			"   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n" +
 			"\n" +
@@ -132,15 +134,12 @@ func GetHelpText(command string) string {
 			"\n" +
 			"ALIAS:\n" +
 			"   lo\n"
-	case "target", "t":
+	case "api", "t":
 		return "NAME:\n" +
-			"   target - Set or view the target\n" +
+			"   api - Set or view the api\n" +
 			"\n" +
 			"USAGE:\n" +
-			"   sb target [-o ORG] [-s SPACE]\n" +
-			"\n" +
-			"ALIAS:\n" +
-			"   t\n"
+			"   sb api\n"
 	case "marketplace", "m":
 		return "NAME:\n" +
 			"   marketplace - List available offerings in the marketplace\n" +
@@ -152,7 +151,7 @@ func GetHelpText(command string) string {
 			"   m\n"
 	case "services", "s":
 		return "NAME:\n" +
-			"   services - List all service instances in the target space\n" +
+			"   services - List all service instances\n" +
 			"\n" +
 			"USAGE:\n" +
 			"   sb services\n" +

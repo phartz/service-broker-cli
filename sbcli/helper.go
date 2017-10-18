@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"strings"
 
+	uuid "github.com/satori/go.uuid"
+
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -27,6 +29,10 @@ func getPassword(prompt string) (password string, err error) {
 		log.Fatal(err)
 	}
 	return
+}
+
+func GetUUID() string {
+	return uuid.NewV4().String()
 }
 
 func CleanTargetURI(uri string) string {
