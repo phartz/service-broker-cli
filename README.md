@@ -46,7 +46,7 @@ COMMANDS
     COMMAND               SHORTCUT    DESCRIPTION
     help                  h           Show help
 
-    target                t           Sets or gets the target
+    api                               Set or view target api url
     login                 l           Login to the target
     logout                lo          Logout from the target
     auth                              Authenticate to the target
