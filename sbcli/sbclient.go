@@ -86,6 +86,20 @@ func (s *SBClient) Instances() (*Instances, error) {
 	return i, err
 }
 
+func (s *SBClient) Instance(instanceId string) (*InstanceResource, error) {
+	result, _, _, err := s.getResultFromBroker(fmt.Sprintf("instances/%s", instanceId), "GET", "{}")
+	if err != nil {
+		return nil, err
+	}
+
+	var i = new(InstanceResource)
+	err = json.Unmarshal(result, &i)
+	if err != nil {
+		return nil, err
+	}
+	return i, err
+}
+
 func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string) (bytes []byte, statusCode int, status string, err error) {
 	statusCode = 0
 	status = ""

@@ -69,8 +69,8 @@ func Services(cmd *Commandline) {
 	fmt.Printf("OK\n\n")
 
 	// start writing service infos to the console
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.FilterHTML)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation")
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 7, ' ', tabwriter.FilterHTML)
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation", "deployment", "organization guid", "space guid")
 	for _, service := range services.Resources {
 		if service.State == "deleted" && cmd.NoFilter == false {
 			continue
@@ -83,7 +83,12 @@ func Services(cmd *Commandline) {
 			}
 		}
 
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalogService[service.ServiceGUID].Name, planName, "./.", service.State)
+		deploymentName := "./."
+		if service.DeploymentName != nil {
+			deploymentName = service.DeploymentName.(string)
+		}
+
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", service.GUIDAtTenant, catalogService[service.ServiceGUID].Name, planName, "./.", service.State, deploymentName, service.Metadata.OrganizationGUID, service.Metadata.SpaceGUID)
 	}
 	w.Flush()
 	fmt.Println("")
@@ -155,46 +160,71 @@ func Service(cmd *Commandline) {
 		catalogService[service.ID] = service
 	}
 
-	services, err := sb.Instances()
+	service, err := sb.Instance(cmd.Options[0])
 	CheckErr(err)
 
-	for _, service := range services.Resources {
-		if service.GUIDAtTenant == cmd.Options[0] {
-			_, _ = sb.LastState(service.GUIDAtTenant)
-			break
-		}
-	}
+	_, _ = sb.LastState(service.GUIDAtTenant)
 
-	services, err = sb.Instances()
+	service, err = sb.Instance(cmd.Options[0])
 	CheckErr(err)
 
-	for _, service := range services.Resources {
-		if service.GUIDAtTenant == cmd.Options[0] {
-			fmt.Println("")
-			planName := "unknown"
-			if name, found := plans[service.PlanGUID]; found {
-				planName = name
-			}
-			lastState, err := sb.LastState(cmd.Options[0])
-			CheckErr(err)
-
-			fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
-			fmt.Printf("Service: %s\n", catalogService[service.ServiceGUID].Name)
-			fmt.Printf("Bound apps: %s\n", "./.")
-			fmt.Printf("Tags:%s\n", strings.Join(catalogService[service.ServiceGUID].Tags, ", "))
-			fmt.Printf("Plan: %s\n", planName)
-			fmt.Printf("Description: %s\n", catalogService[service.ServiceGUID].Description)
-			fmt.Printf("Documentation url: \n")
-			fmt.Printf("Dashboard: \n")
-			fmt.Printf("\n")
-			fmt.Printf("Last Operation: %s\n", lastState.State)
-			fmt.Printf("Status: %s\n", service.State)
-			fmt.Printf("Message: %s\n", lastState.Description)
-			fmt.Printf("Started: %s\n", service.CreatedAt)
-			fmt.Printf("Updated: %s\n", service.UpdatedAt)
-			return
-		}
+	fmt.Println("")
+	planName := "unknown"
+	if name, found := plans[service.PlanGUID]; found {
+		planName = name
 	}
+	lastState, err := sb.LastState(cmd.Options[0])
+	CheckErr(err)
+
+	fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
+	fmt.Printf("Service: %s\n", catalogService[service.ServiceGUID].Name)
+	fmt.Printf("Bound apps: %s\n", "./.")
+	fmt.Printf("Tags:%s\n", strings.Join(catalogService[service.ServiceGUID].Tags, ", "))
+	fmt.Printf("Plan: %s\n", planName)
+	fmt.Printf("Description: %s\n", catalogService[service.ServiceGUID].Description)
+	fmt.Printf("Documentation url: \n")
+	if service.DashboardURL == nil {
+		fmt.Printf("Dashboard: \n")
+	} else {
+		fmt.Printf("Dashboard: %s\n", service.DashboardURL.(string))
+	}
+	if service.DeploymentName == nil {
+		fmt.Printf("Deployment name: \n")
+	} else {
+		fmt.Printf("Deployment name: %s\n", service.DeploymentName.(string))
+	}
+	fmt.Printf("\n")
+	fmt.Printf("Last Operation: %s\n", lastState.State)
+	fmt.Printf("Status: %s\n", service.State)
+	fmt.Printf("Message: %s\n", lastState.Description)
+	fmt.Printf("Started: %s\n", service.CreatedAt)
+	fmt.Printf("Updated: %s\n", service.UpdatedAt)
+	fmt.Printf("\n")
+	fmt.Printf("Organization GUID: %s\n", service.Metadata.OrganizationGUID)
+	fmt.Printf("Space GUID: %s\n", service.Metadata.SpaceGUID)
+	fmt.Printf("Tenand ID: %s\n", service.Metadata.TenantID)
+	fmt.Printf("\n")
+	if service.Metadata.UserParams == nil {
+		fmt.Printf("User params: {}\n")
+	} else {
+		fmt.Printf("User params:\n%s\n", service.Metadata.UserParams.(string))
+	}
+	fmt.Printf("\n")
+	if len(service.VMDetails) == 0 {
+		fmt.Printf("VM details: {}\n")
+	} else {
+		fmt.Printf("VM details:\n-----------\n")
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 6, ' ', 0)
+		fmt.Fprintf(w, "vm identifier\thostname\tcpu\tmemory\tephemeral disk\tpersistent disk\tinstance type\n")
+
+		for _, vmDetails := range service.VMDetails {
+			fmt.Fprintf(w, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", vmDetails.VMIdentifier, vmDetails.Hostname, vmDetails.CPU, vmDetails.Memory, vmDetails.EphemeralDisk, vmDetails.PersistentDisk, vmDetails.InstanceType)
+		}
+		w.Flush()
+		fmt.Println("")
+	}
+
+	return
 
 	CheckErr(errors.New("Service instance not found."))
 }
