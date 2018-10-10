@@ -1,19 +1,32 @@
 package sbcli
 
 type InstanceResource struct {
-	ID            int          `json:"id"`
-	PlanGUID      string       `json:"plan_guid"`
-	ServiceGUID   string       `json:"service_guid"`
-	Metadata      Metadata     `json:"metadata"`
-	DashboardURL  interface{}  `json:"dashboard_url"`
-	State         string       `json:"state"`
-	GUIDAtTenant  string       `json:"guid_at_tenant"`
-	TenantID      string       `json:"tenant_id"`
-	ProvisionedAt string       `json:"provisioned_at"`
-	DeletedAt     string       `json:"deleted_at"`
-	CreatedAt     string       `json:"created_at"`
-	UpdatedAt     string       `json:"updated_at"`
-	Credentials   []Credential `json:"credentials"`
+	ID             int          `json:"id"`
+	PlanGUID       string       `json:"plan_guid"`
+	ServiceGUID    string       `json:"service_guid"`
+	Metadata       Metadata     `json:"metadata"`
+	DashboardURL   interface{}  `json:"dashboard_url"`
+	DeploymentName interface{}  `json:"deployment_name"`
+	State          string       `json:"state"`
+	GUIDAtTenant   string       `json:"guid_at_tenant"`
+	TenantID       string       `json:"tenant_id"`
+	ProvisionedAt  string       `json:"provisioned_at"`
+	DeletedAt      string       `json:"deleted_at"`
+	CreatedAt      string       `json:"created_at"`
+	UpdatedAt      string       `json:"updated_at"`
+	Credentials    []Credential `json:"credentials"`
+	VMDetails      []VMDetails  `json:"vm_details"`
+}
+
+type VMDetails struct {
+	VMIdentifier   string      `json:"vm_identifier"`
+	CPU            int         `json:"cpu"`
+	EphemeralDisk  int         `json:"ephemeral_disk"`
+	PersistentDisk int         `json:"persistent_disk"`
+	Memory         int         `json:"memory"`
+	InstanceType   string      `json:"instance_type"`
+	Hostname       string      `json:"hostname"`
+	Role           interface{} `json:"role"`
 }
 
 type Metadata struct {
