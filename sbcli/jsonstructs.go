@@ -20,10 +20,10 @@ type InstanceResource struct {
 
 type VMDetails struct {
 	VMIdentifier   string      `json:"vm_identifier"`
-	CPU            int         `json:"cpu"`
-	EphemeralDisk  int         `json:"ephemeral_disk"`
-	PersistentDisk int         `json:"persistent_disk"`
-	Memory         int         `json:"memory"`
+	CPU            interface{}         `json:"cpu"`
+	EphemeralDisk  interface{}         `json:"ephemeral_disk"`
+	PersistentDisk interface{}         `json:"persistent_disk"`
+	Memory         interface{}         `json:"memory"`
 	InstanceType   string      `json:"instance_type"`
 	Hostname       string      `json:"hostname"`
 	Role           interface{} `json:"role"`

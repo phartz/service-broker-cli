@@ -248,7 +248,7 @@ func serviceImpl(serviceName string) {
 		fmt.Fprintf(w, "vm identifier\thostname\tcpu\tmemory\tephemeral disk\tpersistent disk\tinstance type\n")
 
 		for _, vmDetails := range service.VMDetails {
-			fmt.Fprintf(w, "%s\t%s\t%d\t%d\t%d\t%d\t%s\n", vmDetails.VMIdentifier, vmDetails.Hostname, vmDetails.CPU, vmDetails.Memory, vmDetails.EphemeralDisk, vmDetails.PersistentDisk, vmDetails.InstanceType)
+			fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%v\t%v\t%s\n", vmDetails.VMIdentifier, vmDetails.Hostname, vmDetails.CPU, vmDetails.Memory, vmDetails.EphemeralDisk, vmDetails.PersistentDisk, vmDetails.InstanceType)
 		}
 		w.Flush()
 		fmt.Println("")
