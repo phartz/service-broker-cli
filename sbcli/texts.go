@@ -161,6 +161,14 @@ func GetHelpText(command string) string {
 			"\n" +
 			"OPTIONS:\n" +
 			"   --no-filter      Returns also the deleted instances.\n"
+	case "find-service":
+		return "NAME:\n" +
+			"   find-service - Lookup service with a given deployment name\n" +
+			"\n" +
+			"USAGE:\n" +
+			"   sb find-service DEPLOYMENT_NAME\n" +
+			"ALIAS:\n" +
+			"   fs\n" 
 	case "service":
 		return "NAME:\n" +
 			"   service - Show service instance info\n" +

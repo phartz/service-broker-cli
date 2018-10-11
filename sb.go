@@ -59,6 +59,7 @@ func registerCommands() {
 	addCommand("marketplace", "m", "List available offerings in the marketplace", sbcli.Marketplace)
 	addCommand("services", "s", "List all service instances in the target space", sbcli.Services)
 	addCommand("service", "", "Show service instance info", sbcli.Service)
+	addCommand("find-service", "fs", "Lookup service with a given deployment name", sbcli.FindService)
 	addCommand("", "", "", nil)
 	addCommand("create-service", "cs", "Create a service instance", sbcli.CreateService)
 	addCommand("update-service", "", "Update a service instance", sbcli.UpdateService)

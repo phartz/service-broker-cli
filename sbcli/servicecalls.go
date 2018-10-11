@@ -70,7 +70,7 @@ func Services(cmd *Commandline) {
 
 	// start writing service infos to the console
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 7, ' ', tabwriter.FilterHTML)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation", "deployment", "organization guid", "space guid")
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "name", "service", "plan", "bound apps", "last operation", "deployment", "organization guid", "space guid")
 	for _, service := range services.Resources {
 		if service.State == "deleted" && cmd.NoFilter == false {
 			continue
@@ -92,6 +92,32 @@ func Services(cmd *Commandline) {
 	}
 	w.Flush()
 	fmt.Println("")
+}
+
+func FindService(cmd *Commandline) {
+	if len(cmd.Options) != 1 {
+		CheckErr(errors.New("Missing arguments!"), GetHelpText("Deployment name"))
+	}
+
+	sb := NewSBClient()
+
+	serviceGuid := ""
+
+	// iterate over all service instances and find the service
+	services, err := sb.Instances()
+	CheckErr(err)
+	for _, service := range services.Resources {
+		if service.DeploymentName != nil && service.DeploymentName == cmd.Options[0] {
+			serviceGuid = service.GUIDAtTenant
+			break
+		}
+	}
+
+	if len(serviceGuid) == 0{
+		fmt.Printf("Can't find service with deployment name: %s\n", cmd.Options[0])
+	}
+
+	serviceImpl(serviceGuid)
 }
 
 // retrieves the available service plans from the service broker
@@ -141,6 +167,10 @@ func Service(cmd *Commandline) {
 	if len(cmd.Options) != 1 {
 		CheckErr(errors.New("Missing arguments!"), GetHelpText("Service"))
 	}
+	serviceImpl(cmd.Options[0])
+}
+
+func serviceImpl(serviceName string) {
 
 	sb := NewSBClient()
 
@@ -160,12 +190,12 @@ func Service(cmd *Commandline) {
 		catalogService[service.ID] = service
 	}
 
-	service, err := sb.Instance(cmd.Options[0])
+	service, err := sb.Instance(serviceName)
 	CheckErr(err)
 
 	_, _ = sb.LastState(service.GUIDAtTenant)
 
-	service, err = sb.Instance(cmd.Options[0])
+	service, err = sb.Instance(serviceName)
 	CheckErr(err)
 
 	fmt.Println("")
@@ -173,7 +203,7 @@ func Service(cmd *Commandline) {
 	if name, found := plans[service.PlanGUID]; found {
 		planName = name
 	}
-	lastState, err := sb.LastState(cmd.Options[0])
+	lastState, err := sb.LastState(serviceName)
 	CheckErr(err)
 
 	fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
