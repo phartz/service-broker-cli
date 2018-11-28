@@ -113,7 +113,7 @@ func FindService(cmd *Commandline) {
 		}
 	}
 
-	if len(serviceGuid) == 0{
+	if len(serviceGuid) == 0 {
 		fmt.Printf("Can't find service with deployment name: %s\n", cmd.Options[0])
 	}
 
@@ -240,7 +240,8 @@ func serviceImpl(serviceName string) {
 		fmt.Printf("User params:\n%s\n", service.Metadata.UserParams.(string))
 	}
 	fmt.Printf("\n")
-	if len(service.VMDetails) == 0 {
+	fmt.Printf("VM details: {%v}\n", service.VMDetails)
+	/*if len(service.VMDetails) == 0 {
 		fmt.Printf("VM details: {}\n")
 	} else {
 		fmt.Printf("VM details:\n-----------\n")
@@ -252,7 +253,7 @@ func serviceImpl(serviceName string) {
 		}
 		w.Flush()
 		fmt.Println("")
-	}
+	}*/
 
 	return
 

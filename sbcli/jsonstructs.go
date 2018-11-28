@@ -15,15 +15,15 @@ type InstanceResource struct {
 	CreatedAt      string       `json:"created_at"`
 	UpdatedAt      string       `json:"updated_at"`
 	Credentials    []Credential `json:"credentials"`
-	VMDetails      []VMDetails  `json:"vm_details"`
+	VMDetails      interface{}  `json:"vm_details"`
 }
 
 type VMDetails struct {
 	VMIdentifier   string      `json:"vm_identifier"`
-	CPU            interface{}         `json:"cpu"`
-	EphemeralDisk  interface{}         `json:"ephemeral_disk"`
-	PersistentDisk interface{}         `json:"persistent_disk"`
-	Memory         interface{}         `json:"memory"`
+	CPU            interface{} `json:"cpu"`
+	EphemeralDisk  interface{} `json:"ephemeral_disk"`
+	PersistentDisk interface{} `json:"persistent_disk"`
+	Memory         interface{} `json:"memory"`
 	InstanceType   string      `json:"instance_type"`
 	Hostname       string      `json:"hostname"`
 	Role           interface{} `json:"role"`
