@@ -53,17 +53,7 @@ func Services(cmd *Commandline) {
 		catalogService[service.ID] = service
 	}
 
-	// first iterate over all service instances and update the status
 	services, err := sb.Instances()
-	CheckErr(err)
-	for _, service := range services.Resources {
-		if service.State == "deleted" {
-			continue
-		}
-		_, _ = sb.LastState(service.GUIDAtTenant)
-	}
-
-	services, err = sb.Instances()
 	CheckErr(err)
 
 	fmt.Printf("OK\n\n")
@@ -193,18 +183,11 @@ func serviceImpl(serviceName string) {
 	service, err := sb.Instance(serviceName)
 	CheckErr(err)
 
-	_, _ = sb.LastState(service.GUIDAtTenant)
-
-	service, err = sb.Instance(serviceName)
-	CheckErr(err)
-
 	fmt.Println("")
 	planName := "unknown"
 	if name, found := plans[service.PlanGUID]; found {
 		planName = name
 	}
-	lastState, err := sb.LastState(serviceName)
-	CheckErr(err)
 
 	fmt.Printf("Service instance: %s\n", service.GUIDAtTenant)
 	fmt.Printf("Service: %s\n", catalogService[service.ServiceGUID].Name)
@@ -224,9 +207,7 @@ func serviceImpl(serviceName string) {
 		fmt.Printf("Deployment name: %s\n", service.DeploymentName.(string))
 	}
 	fmt.Printf("\n")
-	fmt.Printf("Last Operation: %s\n", lastState.State)
 	fmt.Printf("Status: %s\n", service.State)
-	fmt.Printf("Message: %s\n", lastState.Description)
 	fmt.Printf("Started: %s\n", service.CreatedAt)
 	fmt.Printf("Updated: %s\n", service.UpdatedAt)
 	fmt.Printf("\n")
@@ -241,19 +222,6 @@ func serviceImpl(serviceName string) {
 	}
 	fmt.Printf("\n")
 	fmt.Printf("VM details: {%v}\n", service.VMDetails)
-	/*if len(service.VMDetails) == 0 {
-		fmt.Printf("VM details: {}\n")
-	} else {
-		fmt.Printf("VM details:\n-----------\n")
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 6, ' ', 0)
-		fmt.Fprintf(w, "vm identifier\thostname\tcpu\tmemory\tephemeral disk\tpersistent disk\tinstance type\n")
-
-		for _, vmDetails := range service.VMDetails {
-			fmt.Fprintf(w, "%s\t%s\t%v\t%v\t%v\t%v\t%s\n", vmDetails.VMIdentifier, vmDetails.Hostname, vmDetails.CPU, vmDetails.Memory, vmDetails.EphemeralDisk, vmDetails.PersistentDisk, vmDetails.InstanceType)
-		}
-		w.Flush()
-		fmt.Println("")
-	}*/
 
 	return
 

@@ -58,7 +58,7 @@ func (s *SBClient) TestConnection() error {
 	return nil
 }
 
-func (s *SBClient) LastState(instanceId string) (*LastState, error) {
+/* func (s *SBClient) LastState(instanceId string) (*LastState, error) {
 	result, _, _, err := s.getResultFromBroker(fmt.Sprintf("v2/service_instances/%s/last_operation", instanceId), "GET", "{}")
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *SBClient) LastState(instanceId string) (*LastState, error) {
 		return nil, err
 	}
 	return l, err
-}
+} */
 
 func (s *SBClient) Instances() (*Instances, error) {
 	result, _, _, err := s.getResultFromBroker("instances", "GET", "{}")
