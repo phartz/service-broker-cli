@@ -60,6 +60,15 @@ func getConfig() (string, error) {
 }
 
 func (c *Config) load() error {
+	if os.Getenv("SB_HOST") != "" &&
+		os.Getenv("SB_USERNAME") != "" &&
+		os.Getenv("SB_PASSWORD") != "" {
+		c.Credentials.Host = CleanTargetURI(os.Getenv("SB_HOST"))
+		c.Credentials.Username = os.Getenv("SB_USERNAME")
+		c.Credentials.Password = os.Getenv("SB_PASSWORD")
+		return nil
+	}
+
 	file, err := getConfig()
 	if err != nil {
 		return err
