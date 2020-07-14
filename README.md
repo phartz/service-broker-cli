@@ -99,6 +99,21 @@ The credentials will be stored in JSON format in the file `.sb`. Those files can
 --> ~
 ```
 
+### Alternaive Way to Use the CLI
+
+The Service-Broker-CLI is able to read the credentials and the host from environment variables. No login is then needed.
+
+```
+$ SB_HOST="http://redis-service-broker.service.dc1.consul:3000/" SB_USERNAME="admin" SB_PASSWORD="mytopsecretpwd" sb ......
+```
+
+| Env Var | Description |
+|---|---|
+| SB_HOST | The host name, it can be the IP, the FQHN, with or without the scheme and port |
+| SB_USERNAME | The username |
+| SB_PASSWORD | The password |
+
+
 ## Logging
 
 Service-Broker-CLI does not provide a logging in the classical sense. But you can trace the Service Broker API requests and answers.
