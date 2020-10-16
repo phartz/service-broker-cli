@@ -218,7 +218,7 @@ func serviceImpl(serviceName string) {
 	if service.Metadata.UserParams == nil {
 		fmt.Printf("User params: {}\n")
 	} else {
-		fmt.Printf("User params:\n%s\n", service.Metadata.UserParams.(string))
+		fmt.Printf("User params:\n%v\n", service.Metadata.UserParams)
 	}
 	fmt.Printf("\n")
 	fmt.Printf("VM details: {%v}\n", service.VMDetails)
