@@ -55,6 +55,7 @@ COMMANDS
     marketplace           m           List available offerings in the marketplace
     services              s           List all service instances in the target space
     service                           Show service instance info
+    find-service          fs          Lookup a service with a given deployment name
 
     create-service        cs          Create a service instance
     update-service                    Update a service instance
@@ -99,7 +100,7 @@ The credentials will be stored in JSON format in the file `.sb`. Those files can
 --> ~
 ```
 
-### Alternaive Way to Use the CLI
+### Alternative Way to Use the CLI
 
 The Service-Broker-CLI is able to read the credentials and the host from environment variables. No login is then needed.
 
