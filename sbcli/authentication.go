@@ -85,11 +85,15 @@ func Login(cmd *Commandline) {
 	conf := Config{}
 	conf.load()
 
-	// check host
-	if conf.Host == "" {
-		CheckErr(errors.New("No target set!"))
+	if len(cmd.Api) > 0 {
+		conf.Host = cmd.Api
+	} else {
+		// check host
+		if conf.Host == "" {
+			CheckErr(errors.New("No target set!"))
+		}
+		fmt.Printf("Target: %s...", conf.Host)
 	}
-	fmt.Printf("Target: %s...", conf.Host)
 
 	// check if host is reachable
 	sb := NewSBClient(&Credentials{Host: conf.Host})
@@ -100,21 +104,30 @@ func Login(cmd *Commandline) {
 
 	c := Credentials{Host: conf.Host}
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Username> ")
-	c.Username, _ = reader.ReadString('\n')
-	c.Username = strings.TrimSpace(c.Username)
+	if len(cmd.Username) > 0 {
+		c.Username = cmd.Username
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Username> ")
+		c.Username, _ = reader.ReadString('\n')
+		c.Username = strings.TrimSpace(c.Username)
 
-	if c.Username == "" {
-		fmt.Printf("No username given, break!\n")
-		os.Exit(1)
+		if c.Username == "" {
+			fmt.Printf("No username given, break!\n")
+			os.Exit(1)
+		}
 	}
 
 	fmt.Println()
+	c.SkipSslValidation = cmd.SkipSslValidation
 
 	ok := false
 	for i := 0; i < 3; i++ {
-		c.Password, _ = getPassword("Password> ")
+		if i == 0 && len(cmd.Plan) > 0 {
+			c.Password = cmd.Plan
+		} else {
+			c.Password, _ = getPassword("Password> ")
+		}
 
 		fmt.Printf("\nAuthenticating...")
 		sb := NewSBClient(&c)
@@ -131,8 +144,10 @@ func Login(cmd *Commandline) {
 	if ok {
 		conf.Username = c.Username
 		conf.Password = c.Password
+		conf.SkipSslValidation = cmd.SkipSslValidation
 		conf.save()
-		fmt.Printf("Target:   %s\n", conf.Host)
-		fmt.Printf("Username: %s\n", conf.Host)
+		fmt.Printf("Target:            %s\n", conf.Host)
+		fmt.Printf("Username:          %s\n", conf.Username)
+		fmt.Printf("SkipSSLValidation: %d\n", conf.SkipSslValidation)
 	}
 }

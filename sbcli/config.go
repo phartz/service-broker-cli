@@ -5,16 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
+	"strconv"
 )
 
 type Credentials struct {
-	Host     string `json:"host"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Host              string `json:"host"`
+	Username          string `json:"username"`
+	Password          string `json:"password"`
+	SkipSslValidation bool   `json:"skip_ssl_validation"`
 }
 
 type Config struct {
@@ -66,6 +69,13 @@ func (c *Config) load() error {
 		c.Credentials.Host = CleanTargetURI(os.Getenv("SB_HOST"))
 		c.Credentials.Username = os.Getenv("SB_USERNAME")
 		c.Credentials.Password = os.Getenv("SB_PASSWORD")
+		if skipVerify, ok := os.LookupEnv("SB_SKIP_SSL_VERIFY"); ok {
+			value, err := strconv.ParseBool(skipVerify)
+			if err != nil {
+				log.Fatal(err)
+			}
+			c.SkipSslValidation = value
+		}
 		return nil
 	}
 

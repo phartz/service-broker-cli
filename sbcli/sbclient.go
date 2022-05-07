@@ -1,6 +1,7 @@
 package sbcli
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type SBClient struct {
@@ -18,6 +20,11 @@ func (s *SBClient) SetCredentials(c Credentials) {
 	s.Host = c.Host
 	s.Username = c.Username
 	s.Password = c.Password
+	s.SkipSslValidation = c.SkipSslValidation
+}
+
+func (s *SBClient) isHttps() bool {
+	return strings.HasPrefix(s.Host, "https")
 }
 
 func (s *SBClient) Catalog() (*Catalog, error) {
@@ -37,10 +44,18 @@ func (s *SBClient) Catalog() (*Catalog, error) {
 func (s *SBClient) TestConnection() error {
 	if os.Getenv("SB_TRACE") == "ON" {
 		fmt.Println("")
-		fmt.Printf("\tTest host %s\n", s.Host)
+		fmt.Printf("\tTest host: %s\n", s.Host)
 	}
 
-	resp, err := http.Get(s.Host)
+	client := http.Client{Timeout: 15 * time.Second}
+
+	if s.isHttps() {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+
+	resp, err := client.Get(s.Host)
 
 	if err != nil {
 		if os.Getenv("SB_TRACE") == "ON" {
@@ -114,6 +129,28 @@ func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string
 		fmt.Printf("\tBody:\n\t%s\n", jsonStr)
 	}
 
+	client := http.Client{Timeout: 15 * time.Second}
+
+	if s.isHttps() {
+		if os.Getenv("SB_TRACE") == "ON" {
+			fmt.Println("\tHTTPS:      true")
+		}
+
+		var tlsConfig tls.Config
+
+		if s.SkipSslValidation {
+			tlsConfig.InsecureSkipVerify = true
+			if os.Getenv("SB_TRACE") == "ON" {
+				fmt.Println("\tSkip SSL Verification: true ")
+			}
+		}
+
+		t := &http.Transport{
+			TLSClientConfig: &tlsConfig,
+		}
+		client.Transport = t
+	}
+
 	req, err := http.NewRequest(method, target, body)
 	if err != nil {
 		return
@@ -123,7 +160,7 @@ func (s *SBClient) getResultFromBroker(url string, method string, jsonStr string
 	}
 	req.Header.Set("Content-Type", "application/json") //"application/x-www-form-urlencoded")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 
 	if err != nil {
 		if os.Getenv("SB_TRACE") == "ON" {
@@ -242,10 +279,12 @@ func NewSBClient(cred ...*Credentials) *SBClient {
 		sb.Host = conf.Host
 		sb.Password = conf.Password
 		sb.Username = conf.Username
+		sb.SkipSslValidation = conf.SkipSslValidation
 	} else {
 		sb.Host = cred[0].Host
 		sb.Username = cred[0].Username
 		sb.Password = cred[0].Password
+		sb.SkipSslValidation = cred[0].SkipSslValidation
 	}
 
 	return &sb
