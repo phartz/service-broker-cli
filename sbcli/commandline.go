@@ -7,16 +7,19 @@ import (
 )
 
 type Commandline struct {
-	Executable string
-	Command    string
-	Options    []string
-	NoOptions  bool
-	Force      bool
-	Plan       string
-	Tags       string
-	Custom     string
-	JSON       bool
-	NoFilter   bool
+	Executable        string
+	Command           string
+	Options           []string
+	NoOptions         bool
+	Force             bool
+	Plan              string
+	Tags              string
+	Custom            string
+	JSON              bool
+	NoFilter          bool
+	SkipSslValidation bool
+	Api               string
+	Username          string
 }
 
 func (c *Commandline) Parse(options []string) (err error) {
@@ -60,6 +63,9 @@ func (c *Commandline) Parse(options []string) (err error) {
 	custom := flagSet.String("c", "", "")
 	json := flagSet.Bool("j", false, "")
 	noFilter := flagSet.Bool("no-filter", false, "")
+	_ = flagSet.Bool("skip-ssl-validation", false, "")
+	api := flagSet.String("a", "", "")
+	username := flagSet.String("u", "", "")
 
 	flagSet.Parse(options[flagPos:])
 	c.Force = *force
@@ -68,6 +74,9 @@ func (c *Commandline) Parse(options []string) (err error) {
 	c.Custom = c.checkCustom(*custom)
 	c.JSON = *json
 	c.NoFilter = *noFilter
+	c.SkipSslValidation = flagSet.Lookup("skip-ssl-validation") != nil
+	c.Api = *api
+	c.Username = *username
 
 	return
 }

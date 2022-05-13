@@ -5,12 +5,11 @@ It was written to reduce to time to test changes on a Service Broker in the deve
 ## Table of Contents
 This documentation contains the following topics.
 
-* [Download, Build and Install](##Download-Build-and-Install)
-* [Usage](##Usage)
-* [Restrictions](##Restrictions)
-* [Log In](##Log-In)
-* [Logging](##Logging)
-* [CI Pipeline](##ci-pipeline)
+- [Table of Contents](#table-of-contents)
+- [Download, Build and Install](#download-build-and-install)
+- [Usage](#usage)
+- [Restrictions](#restrictions)
+- [Target and login](#target-and-login)
 
 ## Download, Build and Install
 Service Broker CLI is written in [`Go`](https://golang.org). It is designed to use only standard libraries.
@@ -78,16 +77,22 @@ In contrast to to Cloud Foundry CLI the `sb create-service-key` returns the cred
 * The Service Broker also doesn't store any information about the real service names. The broker only works with UUIDs.
 
 
-## Target and log In
+## Target and login
 
 Use `sb target` to target a Service Broker.
 
 ```bash
-$ sb target http://localhost:3000
+$ sb target https://localhost:3001
 ```
 
-To log in you can use either `sb login` as an interactive operation or `sb auth` for scripting.
+SB CLI supports TLS encrypted communication.
+To login you can use either `sb login` as an interactive operation or `sb auth` for scripting.
 
+`sb login` also supports the flags `-a` for API, `-u` for the username and `-p` for the password.
+So you can use
+
+```bash
+$sb login -a https://redis-broker.service.dc1.consul.dsf2:3001 -u admin -p <password>
 The credentials will be stored in JSON format in the file `.sb`. Those files can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
 ```
@@ -113,6 +118,7 @@ $ SB_HOST="http://redis-service-broker.service.dc1.consul:3000/" SB_USERNAME="ad
 | SB_HOST | The host name, it can be the IP, the FQHN, with or without the scheme and port |
 | SB_USERNAME | The username |
 | SB_PASSWORD | The password |
+| SB_SKIP_SSL_VERIFY | If true SSL verification is skipped |
 
 
 ## Logging
@@ -123,6 +129,3 @@ Service-Broker-CLI does not provide a logging in the classical sense. But you ca
 $ SB_TRACE=ON && sb services
 ```
 
-## CI Pipeline
-
-A [concourse](concourse.ci) based CI pipeline can be found [here](https://phartz.dedyn.io/teams/main/pipelines/service-broker-cli)
