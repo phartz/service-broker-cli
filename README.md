@@ -93,6 +93,8 @@ So you can use
 
 ```bash
 $sb login -a https://redis-broker.service.dc1.consul.dsf2:3001 -u admin -p <password>
+```
+
 The credentials will be stored in JSON format in the file `.sb`. Those files can be located either in the current working directory or in its parent directory. If the file was not found, sb is looking also in the users root path.
 
 ```
