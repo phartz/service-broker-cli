@@ -304,20 +304,8 @@ func DeleteService(cmd *Commandline) {
 
 	sb := NewSBClient()
 
-	instances, err := sb.Instances()
+	_, err := sb.Instance(cmd.Options[0])
 	CheckErr(err)
-
-	found := false
-	for _, instance := range instances.Resources {
-		if instance.GUIDAtTenant == cmd.Options[0] {
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		CheckErr(errors.New("Service not found!"))
-	}
 
 	if !cmd.Force {
 		reader := bufio.NewReader(os.Stdin)
@@ -351,20 +339,8 @@ func UpdateService(cmd *Commandline) {
 
 	sb := NewSBClient()
 
-	instances, err := sb.Instances()
+	_, err := sb.Instance(cmd.Options[0])
 	CheckErr(err)
-
-	found := false
-	for _, instance := range instances.Resources {
-		if instance.GUIDAtTenant == cmd.Options[0] {
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		CheckErr(errors.New("Service not found!"))
-	}
 
 	data, err := getServiceIDPlanID(cmd.Options[0])
 	CheckErr(err)
